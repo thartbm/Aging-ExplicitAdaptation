@@ -1,0 +1,276 @@
+---
+title: 'Explicit Aging: Analyses and Results'
+author:
+- Chad Vachon
+- Marius 't Hart
+- Denise Henriques
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: '2'
+  pdf_document:
+    number_sections: yes
+    toc: yes
+    toc_depth: '2'
+---
+
+# Preliminaries
+
+Do we need to load any libraries / packages?
+
+```{r eval=T, echo=F, message=F}
+
+library('ez')
+#library('sjstats')
+#library('car')
+#library('psych')
+#library('ggplot2')
+#library('dplyr')
+library('svglite')
+library('effsize') # to calculate cohen's d
+
+```
+
+Functions for R scripts that we need to use:
+
+```{r}
+source('R/learning_curves.R') # this file has all the data analysis stuff for learning curves
+source('R/reach_aftereffects.R') # in this file we deal with reach aftereffects
+source('R/localization.R') # scripts for localization stuff
+
+# should this go into learning curve stuff, or in reach aftereffect stuff?
+# source('learning_aftereffect_ana.R')
+
+# what is this file for? delete?
+# source('chad_code.R')
+
+source('R/shared.R') # ?? do we need anything else?  color schema, and generic functions such as for confidence intervals
+
+
+
+
+#source('LocalizationAging_angle_removed.R')
+#source('predictedConsequences.R')
+#source('awareness_code_recent.R') # Marius: Windows ignores case in file names, but all other operating systems I know don't, so this file could not be imported... and we don't need it anyway
+```
+
+
+
+Do we want to define the colors outside of the plotting functions, so that they are consistent, and can be easily changed in one spot? 
+
+Unsure how to do this? Marius: Put it in a function! Just like in the example code. I made one in shared.R, because we will use the same colors and linestyles everywhere. The function is called: 'getStyle()'.
+
+# Learning
+
+Instructions should affect early learning, but we are interested to see if instructions help older adults as much as younger adults. That is, do we see any evidence of cognitive decline?
+
+## Was there any learning?
+
+_What is the question we're answering here?_ It's not wether or not any learning occured, as that would ask for a different analysis. It is wether or not reach direction changed during the rotated training block.
+
+_What is the data? Do we see a hint of the answer in the data?_ Here is the figure:
+
+```{r, fig.width=8, fig.height=4}
+# produce a plot (current panels 7A & 7B)
+plotLearningCurves()
+```
+
+
+_What does the data actually tell us?_ We do a three-way mixed ANOVA on reach deviations, using block (first, second and last), instructed (non-instructed or instructed) and agegroup (younger or older) as factors.
+
+```{r}
+# do a statistical analysis (omnibus ANOVA)
+learningCurveANOVA()
+
+```
+
+_What does that mean? What is the answer to the question?_ There is an effect of block (that interacts with instructions and age group) so that reach deviations changed throughout the rotated training. 
+
+
+## First Block of Training
+
+Here we want to see the effects of and interaction between age group and instruction, very early on in learning.
+
+
+```{r}
+blockLearningANOVA(block=1)
+```
+
+There is an interaction between age group and instruction, so we want to test what causes this. Hence we do some follow-up tests. First a t-test looking to see if instruction had an effect within older adults.
+
+```{r}
+blockLearningTtest(block=1, 
+                   groups=list(
+                     list('agegroup'='older', 'instructed'=TRUE),
+                     list('agegroup'='older', 'instructed'=FALSE)))
+```
+
+It appears, an instruction **did** benefit older adults. Yay!
+
+Now we want to see if it benefited older adults as much as younger adults:
+
+```{r}
+blockLearningTtest(block=1, 
+                   groups=list(
+                     list('agegroup'='older', 'instructed'=TRUE),
+                     list('agegroup'='younger', 'instructed'=TRUE)))
+```
+
+But apparently, there is a difference here, which implies that older adults do not benefit from instruction as much as younger adults - at least in the first few trials.
+
+## Second Block of Training
+
+We repeat the ANOVA on reach deviations using age group and instruction as factors, but now on the data from the second block of three trials:
+
+```{r}
+blockLearningANOVA(block=2)
+```
+
+Crucially, there is no effect of age group, nor an interaction. Hence we skip any follow-ups: there is a benefit of instruction, but this is not different for the two age groups anymore.
+
+
+# Reach Aftereffects
+
+After training, with or without instructions, people are more or less aware of the rotation that the experiment imposes on the visual feedback. To the degree that they are aware of what they are doing to reach the target with altered feedback, they should also be able to "switch off" their strategy, which we test here with a PDP-like method (see Werner et al., 2015).
+
+## Did the direction of no-cursor reaches change with traing?
+
+_What is the question we're answering here?_
+
+_What is the data? Do we see a hint of the answer in the data?_
+
+```{r, fig.width=4, fig.height=4}
+# produce a plot (current panels 7C)
+plotReachAftereffects()
+```
+
+## Are there reach aftereffects?
+
+We will use the "exclude strategy" condition to test if there are effects of rotated training on no-cursor reach directions, in a three-way mixed ANOVA, using training session (aligned or rotated) as a within-subjects factor, and instruction (yes or no) and age group (older or younger) as a between-subjects factor:
+
+```{r}
+NoCursorANOVA()
+```
+
+This means that open-loop reaches changed direction after training with rotated feedback (effect of training). There were other effects which we will explore below.
+
+
+## Are reach aftereffects affected by strategy use in the four groups?
+
+Do a three-way, mixed design ANOVA on reach aftereffects with instructed (yes or no) and age group (older vs. younger) as between-subjects factors and strategy use (with or without) as a within-subjects factor:
+
+```{r}
+# do a statistical analysis (ANOVA on reach aftereffects)
+RAE.ANOVA()
+```
+
+_What does that mean? What is the answer to the question?_
+
+Instruction and strategy interact, which means that when provided with an instruction, people can elicit part of their learning at will, i.e.: it is explicit. There is a main effect of age group, but more importantly, this doesn't interact with anything, so that we can say that the effect of instruction on explicit learning is the same for both age groups.
+
+# Localization
+
+To move we need to have position information on our limbs (and on targets). In the absence of vision we can use proprioception as well efference-based predicted consequences. Both of these are changed with visuomotor training. Here we try to tease them apart by...
+
+## Does localization change with training?
+
+_What is the question we're answering here?_
+
+_What is the data? Do we see a hint of the answer in the data?_
+
+```{r, fig.width=8, fig.height=2.66666}
+# produce a plot: Fig9
+plotLocalization()
+```
+
+_What does the data actually tell us?_
+
+First we do an "omnibus ANOVA" to see if there is any effect of rotated training on localization.
+
+```{r}
+# do a statistical analysis (omnibus ANOVA)
+localizationANOVA()
+```
+
+_What does that mean? What is the answer to the question?_
+
+Yes, rotated training shifts localization. There are some other effects, but we will test this in more depth later on.
+
+If explicit learning prevents localization (since you **know** the feedback is not veridical) then instructions should affect localization shift. If older participants use instructions differently, or if their proprioceptive acuity has decreased, age group should also affect localization shift. That is what we test here: 
+
+```{r}
+# do a statistical analysis (ANOVA on passive localization difference scores)
+localizationANOVA(test='shifts')
+```
+
+## Is proprioceptive recalibration affected by age and instruction?
+
+_What is the question we're answering here? (Why could that be the case?)_
+
+_What is the data? (Same figure as above.) Do we see a hint of the answer in the data?_
+
+_What does the data actually tell us?_
+
+
+```{r}
+localizationANOVA(test='passive')
+```
+
+
+_What does that mean? What is the answer to the question?_
+
+Instruction does not affect localization, so that it seems that visuo-proprioceptive discrepancies can't be ignored. There is also an effect of age group and an effect of movement type that we will investigate further.
+
+## Are predicted sensory consequences affected by age and instruction?
+
+_What is the question we're answering here? (Why could that be the case?)_
+
+_What is the data? (Same figure as above.) Do we see a hint of the answer in the data?_
+
+_What does the data actually tell us?_
+
+```{r}
+# do a statistical analysis (ANOVA on the difference between active and passive localization difference scores)
+predictedConsequencesANOVA()
+
+```
+
+_What does that mean? What is the answer to the question?_
+
+## Do older adults show predicted sensory consequences at all?
+
+We test the magnitude of predicted sensory consequences against 0 for all younger as well as for all older participants with t-tests.
+
+
+```{r}
+predConsTtests()
+```
+
+We would probably want to add $\eta^2_p$ to these t-tests at some point. But they are against 0, so they can't be translated to a one-way ANOVA.
+
+## Do we have any evidence of declined proprioceptive acuity in the older participants?
+
+Here comes a test that is largely copied from the Baseline project, and it uses only the aligned data.
+
+```{r}
+plotVarianceAge(target='svg')
+```
+
+
+
+Where we mention R, we should cite them:
+
+```{r}
+citation()
+```
+
+
+```{r eval=F, echo=F}
+# Generate the plots for the manuscript:
+
+plotLearningCurves(target='svg')
+plotReachAftereffects(target='svg')
+plotLocalization(target='svg')
+```
+
