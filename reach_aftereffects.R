@@ -1,61 +1,3 @@
-PopulateData_osf <- function(){
-  library(osfr)
-  library(dplyr)
-  
-  if (length(list.files(path = './data2')) < 3) {
-    osfProject <- osf_retrieve_node('QZHMY')
-    osfDataFiles <- osfProject %>%
-      osf_ls_files() %>%
-      filter(name == "data") %>%
-      osf_ls_files(n_max = 100)
-    
-    # for(i in 1:nrow(osfDataFiles)) {
-    #   row <- osfDataFiles[i,]
-    #   # do stuff with row
-    #   osf_download(row, path = paste("./data2", row$name, sep="/"))
-    # }
-    
-    # #make a list of download links
-    # osfDownloadLinks <- data.frame()
-    # for(i in 1:nrow(osfDataFiles)) {
-    #   row <- osfDataFiles[i,]
-    #   # do stuff with row
-    #   osfDownloadLinks <- c(osfDownloadLinks, row$meta[[1]]$links$download)
-    
-    #save this thing
-    saveRDS(osfDataFiles, file = 'osfDataFiles.rds')
-  }
-}
-
-# load.DownloadDataframe <- function(url,filename) {
-#   
-#   if (file.exists(filename)) {
-#     
-#     df <- read.csv(filename, stringsAsFactors=FALSE)
-#     
-#   } else {
-#     
-#     df <- read.csv(url(url),stringsAsFactors=FALSE)
-#     
-#     write.csv(df,filename,row.names=FALSE,quote=FALSE)
-#     
-#   }
-#   
-#   return(df)
-#   
-# }
-
-# populate the /data directory using the osfDataFiles object
-PopulateData <- function(){
-  osfDataFiles<- readRDS('osfDataFiles.rds') 
-  if (length(list.files(path = './data')) < 3) {
-    for(i in 1:nrow(osfDataFiles)){
-      row <- osfDataFiles[i,]
-      
-      download.file(url = row$meta[[1]]$links$download, destfile = paste("./data", row$name, sep="/"))
-    }
-  }
-}
 
 plotReachAftereffects <- function(target='inline') {
   
@@ -75,7 +17,7 @@ plotReachAftereffects <- function(target='inline') {
     
     group <- styles$group[groupno]
 
-    reachaftereffects <- read.csv(sprintf('../../data/%s_reachaftereffects.csv',group), stringsAsFactors=FALSE)
+    reachaftereffects <- read.csv(sprintf('data/%s_reachaftereffects.csv',group), stringsAsFactors=FALSE)
     
     meanExc <- mean(reachaftereffects$exclusive)
     meanInc <- mean(reachaftereffects$inclusive)
@@ -91,7 +33,7 @@ plotReachAftereffects <- function(target='inline') {
     group <- styles$group[groupno]
     offset <- (groupno - ((length(styles$group) - 1) / 2)) * .035
     
-    reachaftereffects <- read.csv(sprintf('../../data/%s_reachaftereffects.csv',group), stringsAsFactors=FALSE)
+    reachaftereffects <- read.csv(sprintf('data/%s_reachaftereffects.csv',group), stringsAsFactors=FALSE)
     
     meanExc <- mean(reachaftereffects$exclusive)
     meanInc <- mean(reachaftereffects$inclusive)
@@ -139,7 +81,7 @@ getRAE4ANOVA <- function(styles) {
     }
     thisinstructed <- grepl('explicit', group)
     
-    df <- read.csv(sprintf('../../data/%s_reachaftereffects.csv',group),stringsAsFactors=F)
+    df <- read.csv(sprintf('data/%s_reachaftereffects.csv',group),stringsAsFactors=F)
     
     # we need to know the number of participants to replicate some values:
     N <- dim(df)[1]
@@ -212,7 +154,7 @@ getNoCursors4ANOVA <- function(styles) {
     }
     thisinstructed <- grepl('explicit', group)
     
-    df <- read.csv(sprintf('../../data/%s_nocursors.csv',group),stringsAsFactors=F)
+    df <- read.csv(sprintf('data/%s_nocursors.csv',group),stringsAsFactors=F)
     
     AL.NC <- df[,c('participant','aligned')]
     colnames(AL.NC)[2] <- 'reachdeviation'
