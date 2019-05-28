@@ -1,63 +1,6 @@
 
 # regular localization analyses # ============================================
-PopulateData_osf <- function(){
-  library(osfr)
-  library(dplyr)
-  
-  if (length(list.files(path = './data2')) < 3) {
-    osfProject <- osf_retrieve_node('QZHMY')
-    osfDataFiles <- osfProject %>%
-      osf_ls_files() %>%
-      filter(name == "data") %>%
-      osf_ls_files(n_max = 100)
-    
-    # for(i in 1:nrow(osfDataFiles)) {
-    #   row <- osfDataFiles[i,]
-    #   # do stuff with row
-    #   osf_download(row, path = paste("./data2", row$name, sep="/"))
-    # }
-    
-    # #make a list of download links
-    # osfDownloadLinks <- data.frame()
-    # for(i in 1:nrow(osfDataFiles)) {
-    #   row <- osfDataFiles[i,]
-    #   # do stuff with row
-    #   osfDownloadLinks <- c(osfDownloadLinks, row$meta[[1]]$links$download)
-    
-    #save this thing
-    saveRDS(osfDataFiles, file = 'osfDataFiles.rds')
-  }
-}
 
-# load.DownloadDataframe <- function(url,filename) {
-#   
-#   if (file.exists(filename)) {
-#     
-#     df <- read.csv(filename, stringsAsFactors=FALSE)
-#     
-#   } else {
-#     
-#     df <- read.csv(url(url),stringsAsFactors=FALSE)
-#     
-#     write.csv(df,filename,row.names=FALSE,quote=FALSE)
-#     
-#   }
-#   
-#   return(df)
-#   
-# }
-
-# populate the /data directory using the osfDataFiles object
-PopulateData <- function(){
-  osfDataFiles<- readRDS('osfDataFiles.rds') 
-  if (length(list.files(path = './data')) < 3) {
-    for(i in 1:nrow(osfDataFiles)){
-      row <- osfDataFiles[i,]
-      
-      download.file(url = row$meta[[1]]$links$download, destfile = paste("./data", row$name, sep="/"))
-    }
-  }
-}
 plotLocalization <- function(target='inline') {
   
   styles <- getStyle()
@@ -88,7 +31,7 @@ plotLocalization <- function(target='inline') {
       
       group <- styles$group[groupno]
       
-      localization <- read.csv(sprintf('../../data/%s_localization_tCI.csv',group))
+      localization <- read.csv(sprintf('data/%s_localization_tCI.csv',group))
       
       angles <- localization$angle
       lo <- localization[,sprintf('%s_p2.5',c('act','pas')[reachtype.idx])]
@@ -106,7 +49,7 @@ plotLocalization <- function(target='inline') {
       
       group <- styles$group[groupno]
       
-      localization <- read.csv(sprintf('../../data/%s_localization_tCI.csv',group))
+      localization <- read.csv(sprintf('data/%s_localization_tCI.csv',group))
       
       angles <- localization$angle
       centre <- localization[,sprintf('%s_p50',c('act','pas')[reachtype.idx])]
@@ -123,7 +66,7 @@ plotLocalization <- function(target='inline') {
       
       group <- styles$group[groupno]
       
-      localization <- read.csv(sprintf('../../data/%s_loc_p3_AOV.csv',group))
+      localization <- read.csv(sprintf('data/%s_loc_p3_AOV.csv',group))
       localization <- localization[which(localization$passive_b == (reachtype.idx-1)),]
       localization <- aggregate(bias_deg ~ participant*rotated_b, data=localization, FUN=mean)
       shift <- localization$bias_deg[which(localization$rotated_b == 1)] - localization$bias_deg[which(localization$rotated_b == 0)]
@@ -151,7 +94,7 @@ plotLocalization <- function(target='inline') {
     
     group <- styles$group[groupno]
     
-    localization <- read.csv(sprintf('../../data/%s_localization_tCI.csv',group))
+    localization <- read.csv(sprintf('data/%s_localization_tCI.csv',group))
     
     angles <- localization$angle
     lo <- localization$PredCons_p2.5
@@ -169,7 +112,7 @@ plotLocalization <- function(target='inline') {
     
     group <- styles$group[groupno]
     
-    localization <- read.csv(sprintf('../../data/%s_localization_tCI.csv',group))
+    localization <- read.csv(sprintf('data/%s_localization_tCI.csv',group))
     
     angles <- localization$angle
     PSQ <- localization$PredCons_p50
@@ -189,7 +132,7 @@ plotLocalization <- function(target='inline') {
     shifts <- list()
     
     for (reachtype.idx in c(1,2)) {
-      localization <- read.csv(sprintf('../../data/%s_loc_p3_AOV.csv',group))
+      localization <- read.csv(sprintf('data/%s_loc_p3_AOV.csv',group))
       localization <- localization[which(localization$passive_b == (reachtype.idx-1)),]
       localization <- aggregate(bias_deg ~ participant*rotated_b, data=localization, FUN=mean)
       shift <- localization$bias_deg[which(localization$rotated_b == 1)] - localization$bias_deg[which(localization$rotated_b == 0)]
@@ -270,7 +213,7 @@ getLocalization4ANOVA <- function(styles, shifts=FALSE) {
     }
     thisinstructed <- grepl('explicit', group)
     
-    df <- read.csv(sprintf('../../data/%s_loc_p3_AOV.csv',group),stringsAsFactors=F)
+    df <- read.csv(sprintf('data/%s_loc_p3_AOV.csv',group),stringsAsFactors=F)
     
     df <- aggregate(bias_deg ~ participant * rotated_b * passive_b, data=df, FUN=mean)
     if (shifts) {
@@ -302,7 +245,7 @@ getLocalization4ANOVA <- function(styles, shifts=FALSE) {
 }
 
 getPredictedSensoryConsequences <- function(agegroups='both') {
-  #setwd("~/Grad Thesis/Explicit/R/ana")
+  
   # first we load the files, depending on which age groups we want:
   # 'both': both older and younger participants
   # 'younger': only the younger participants
@@ -311,9 +254,9 @@ getPredictedSensoryConsequences <- function(agegroups='both') {
   # load the younger participants data if necessary:
   if (agegroups %in% c('both','younger')) {
     
-    exp <- read.csv('../../data/30explicit_loc_p3_AOV.csv')
+    exp <- read.csv('data/30explicit_loc_p3_AOV.csv')
     exp$instructed <- 1
-    imp <- read.csv('../../data/30implicit_loc_p3_AOV.csv')
+    imp <- read.csv('data/30implicit_loc_p3_AOV.csv')
     imp$instructed <- 0
     
     # combine implicit and explicit data:
@@ -327,9 +270,9 @@ getPredictedSensoryConsequences <- function(agegroups='both') {
   # load the older participants data if necessary:
   if (agegroups %in% c('both','older')) {
     
-    exp <- read.csv('../../data/aging_explicit_loc_p3_AOV.csv')
+    exp <- read.csv('data/aging_explicit_loc_p3_AOV.csv')
     exp$instructed <- 1
-    imp <- read.csv('../../data/aging_implicit_loc_p3_AOV.csv')
+    imp <- read.csv('data/aging_implicit_loc_p3_AOV.csv')
     imp$instructed <- 0 
     
     # combine explicit with implicit data
