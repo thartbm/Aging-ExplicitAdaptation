@@ -23,29 +23,36 @@ Do we need to load any libraries / packages?
 
 library('ez')
 #library('sjstats')
-#library('car')
+library('car')
 #library('psych')
-#library('ggplot2')
-#library('dplyr')
+library('ggplot2')
+library('dplyr')
 library('svglite')
 library('effsize') # to calculate cohen's d
+
+library('osfr')
+#if cannot load osfr, then you should do the following:
+#install.packages("remotes")
+#library('remotes')
+#remotes::install_github("centerforopenscience/osfr")
 
 ```
 
 Functions for R scripts that we need to use:
 
 ```{r}
-source('R/learning_curves.R') # this file has all the data analysis stuff for learning curves
-source('R/reach_aftereffects.R') # in this file we deal with reach aftereffects
-source('R/localization.R') # scripts for localization stuff
-
+source('learning_curves.R') # this file has all the data analysis stuff for learning curves
+source('reach_aftereffects.R') # in this file we deal with reach aftereffects
+source('localization.R') # scripts for localization stuff
+source('PopulateData.R') # scripts for localization stuff
+source('PopulateData_osf.R')
 # should this go into learning curve stuff, or in reach aftereffect stuff?
 # source('learning_aftereffect_ana.R')
 
 # what is this file for? delete?
 # source('chad_code.R')
 
-source('R/shared.R') # ?? do we need anything else?  color schema, and generic functions such as for confidence intervals
+source('shared.R') # ?? do we need anything else?  color schema, and generic functions such as for confidence intervals
 
 
 
@@ -54,9 +61,14 @@ source('R/shared.R') # ?? do we need anything else?  color schema, and generic f
 #source('predictedConsequences.R')
 #source('awareness_code_recent.R') # Marius: Windows ignores case in file names, but all other operating systems I know don't, so this file could not be imported... and we don't need it anyway
 ```
+Check to see if data is present and if not, populate folder:
 
+```{r}
+PopulateData_osf()
 
+PopulateData()
 
+```
 Do we want to define the colors outside of the plotting functions, so that they are consistent, and can be easily changed in one spot? 
 
 Unsure how to do this? Marius: Put it in a function! Just like in the example code. I made one in shared.R, because we will use the same colors and linestyles everywhere. The function is called: 'getStyle()'.
@@ -247,30 +259,11 @@ We test the magnitude of predicted sensory consequences against 0 for all younge
 predConsTtests()
 ```
 
-We would probably want to add $\eta^2_p$ to these t-tests at some point. But they are against 0, so they can't be translated to a one-way ANOVA.
-
-## Do we have any evidence of declined proprioceptive acuity in the older participants?
-
-Here comes a test that is largely copied from the Baseline project, and it uses only the aligned data.
-
-```{r}
-plotVarianceAge(target='svg')
-```
-
-
-
-Where we mention R, we should cite them:
+R-citation
 
 ```{r}
 citation()
 ```
 
 
-```{r eval=F, echo=F}
-# Generate the plots for the manuscript:
-
-plotLearningCurves(target='svg')
-plotReachAftereffects(target='svg')
-plotLocalization(target='svg')
-```
 
