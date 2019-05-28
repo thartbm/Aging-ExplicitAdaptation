@@ -1,61 +1,4 @@
-PopulateData_osf <- function(){
-  library(osfr)
-  library(dplyr)
-  
-  if (length(list.files(path = './data2')) < 3) {
-    osfProject <- osf_retrieve_node('QZHMY')
-    osfDataFiles <- osfProject %>%
-      osf_ls_files() %>%
-      filter(name == "data") %>%
-      osf_ls_files(n_max = 100)
-    
-    # for(i in 1:nrow(osfDataFiles)) {
-    #   row <- osfDataFiles[i,]
-    #   # do stuff with row
-    #   osf_download(row, path = paste("./data2", row$name, sep="/"))
-    # }
-    
-    # #make a list of download links
-    # osfDownloadLinks <- data.frame()
-    # for(i in 1:nrow(osfDataFiles)) {
-    #   row <- osfDataFiles[i,]
-    #   # do stuff with row
-    #   osfDownloadLinks <- c(osfDownloadLinks, row$meta[[1]]$links$download)
-    
-    #save this thing
-    saveRDS(osfDataFiles, file = 'osfDataFiles.rds')
-  }
-}
 
-# load.DownloadDataframe <- function(url,filename) {
-#   
-#   if (file.exists(filename)) {
-#     
-#     df <- read.csv(filename, stringsAsFactors=FALSE)
-#     
-#   } else {
-#     
-#     df <- read.csv(url(url),stringsAsFactors=FALSE)
-#     
-#     write.csv(df,filename,row.names=FALSE,quote=FALSE)
-#     
-#   }
-#   
-#   return(df)
-#   
-# }
-
-# populate the /data directory using the osfDataFiles object
-PopulateData <- function(){
-  osfDataFiles<- readRDS('osfDataFiles.rds') 
-  if (length(list.files(path = './data')) < 3) {
-    for(i in 1:nrow(osfDataFiles)){
-      row <- osfDataFiles[i,]
-      
-      download.file(url = row$meta[[1]]$links$download, destfile = paste("./data", row$name, sep="/"))
-    }
-  }
-}
 plotLearningCurves <- function(target='inline') {
   
   styles <- getStyle()
@@ -77,7 +20,7 @@ plotLearningCurves <- function(target='inline') {
   for (groupno in c(1:length(styles$group))) {
     
     group  <- styles$group[groupno]
-    curves <- read.csv(sprintf('../../data/%s_curves.csv',group), stringsAsFactors=FALSE)  
+    curves <- read.csv(sprintf('data/%s_curves.csv',group), stringsAsFactors=FALSE)  
     curve  <- apply(curves, c(1), mean, na.rm=T)
     
     lines(c(1:15),curve[1:15],col=as.character(styles$color_solid[groupno]),lty=styles$linestyle[groupno],lw=2)
@@ -150,7 +93,7 @@ plotLearningCurves <- function(target='inline') {
 
 getBlockedLearningCurves <- function(group, blockdefs) {
   
-  curves <- read.csv(sprintf('../../data/%s_curves.csv',group), stringsAsFactors=FALSE)  
+  curves <- read.csv(sprintf('data/%s_curves.csv',group), stringsAsFactors=FALSE)  
   
   # R <- dim(curves)[1] # should always be 90
   N <- dim(curves)[2]
