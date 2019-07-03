@@ -23,42 +23,26 @@ output:
 ```{r eval=T, echo=F, message=F}
 
 library('ez')
-#library('sjstats')
 library('car')
-#library('psych')
-library('ggplot2')
 library('dplyr')
 library('svglite')
-library('effsize') # to calculate cohen's d
-
-library('osfr')
-#if cannot load osfr, then you should do the following:
-#install.packages("remotes")
-#library('remotes')
-#remotes::install_github("centerforopenscience/osfr")
+library('effsize') # to calculate cohen's d??
 
 ```
 
 Functions for R scripts that we need to use:
 
 ```{r}
-source('learning_curves.R') # this file has all the data analysis stuff #for learning curves
-source('reach_aftereffects.R') # in this file we deal with reach #aftereffects
-source('localization.R') # scripts for localization stuff
-source('PopulateData.R') # scripts for localization stuff
-source('PopulateData_osf.R')
-
-
-source('shared.R') # Color schema, and generic functions such as for #confidence intervals
-
+source('R/learning_curves.R') # this file has all the data analysis stuff for learning curves
+source('R/reach_aftereffects.R') # in this file we deal with reach aftereffects
+source('R/localization.R') # scripts for localization stuff
+source('R/shared.R') # color scheme, function for confidence intervals, data downloader
 ```
+
 Check to see if data is present and if not, populate folder:
 
 ```{r}
-PopulateData_osf()
-
-PopulateData()
-
+ensureData()
 ```
 
 # Learning
@@ -86,12 +70,11 @@ learningCurveANOVA()
 
 ```
 
-_What does that mean? What is the answer to the question?_ We find a significant effect of block (that interacts with instructions and age group) so that reach deviations changed throughout the rotated training. We also show that instruction type does interact with age group (Older and younger)
-
+We find a significant effect of block (that interacts with instructions and age group) so that reach deviations changed throughout the rotated training. We also show that instruction type does interact with age group, so that older and younger participants learned differently in the training.
 
 ## First Block of Training
 
-We had a specific prediction that instructed older adults would not benefit from the instructions as much as instructed younger adults. Here we want to see the effects of and interaction between age group and instruction, very early on in learning. We find that older instructed adults do not use the strategy as well younger instructed adults.
+We had a specific prediction that instructed older adults would not benefit from the instructions as much as instructed younger adults. Here we want to see the effects of and interaction between age group and instruction, very early on in learning.
 
 
 ```{r}
@@ -99,6 +82,7 @@ blockLearningANOVA(block=1)
 ```
 
 There is an interaction between age group and instruction, so we want to test what causes this. Hence we do some follow-up tests. First a t-test looking to see if instruction had an effect within older adults.
+
 
 ```{r}
 blockLearningTtest(block=1, 
@@ -116,7 +100,7 @@ blockLearningTtest(block=1,
                      list('agegroup'='younger', 'instructed'=TRUE)))
 ```
 
-However, there is a difference in that older adults do not benefit from instruction as much as younger adults - at least in the first few trials. 
+There is a difference in that older adults do not benefit from instruction as much as younger adults - at least in the first few trials.
 
 ## Second Block of Training
 
@@ -126,12 +110,11 @@ We wanted to see whether the effect of age and instruction would continue for th
 blockLearningANOVA(block=2)
 ```
 
-Crucially, there is no effect of age group, nor an interaction. Hence we skip any follow-ups: there is a benefit of instruction, but this is not different for the two age groups anymore within the second set of trials. We do however see that instruction is still having an effect on reaching movements.
-
+Crucially, there is no effect of age group, nor an interaction between age group and instruction. Hence we skip any follow-ups: the benefit of instruction is not different for the two age groups in the second block of three trials.
 
 # Reach Aftereffects
 
-After training with a visual rotation, with or without instructions, people are more or less aware of the rotation that the experiment imposes on the visual feedback. To the degree that they are aware of what they are doing to reach to the target with altered feedback, they should also be able to "switch off" their strategy, which we test here with a PDP-like method (see Werner et al., 2015) by asking participants to reach with or without a strategy  without a cursor.
+After training with a visual rotation, with or without instructions, people are more or less aware of the rotation that the experiment imposes on the visual feedback. To the degree that they are aware of what they are doing to reach to the target with altered feedback, they should also be able to "switch off" their strategy, which we test here with a PDP-like method (see Werner et al., 2015) by asking participants to reach with or without a strategy in the absence of visual feedback ("no-cursor" or "open-loop" reaches).
 
 
 ```{r, fig.width=4, fig.height=4}
@@ -141,35 +124,32 @@ plotReachAftereffects()
 
 ## Are there reach aftereffects?
 
-We use the "exclude strategy" condition to test if there are effects of rotated training on no-cursor reach directions, in a three-way mixed ANOVA, using training session (aligned or rotated) as a within-subjects factor, and instruction (yes or no) and age group (older or younger) as a between-subjects factor:
+First, we use the "without strategy" condition to test if there are effects of rotated training on no-cursor reach directions, in a three-way mixed ANOVA, using training session (aligned or rotated) as a within-subjects factor, and instruction (yes or no) and age group (older or younger) as a between-subjects factor:
 
 ```{r}
 NoCursorANOVA()
 ```
 
-We found that there were reach aftereffects. This means that open-loop reaches changed direction after training with rotated feedback (effect of training). There were other effects which we will explore below.
-
+As expected there is a main effect of training, i.e. there were reach aftereffects. In other words: the participants adapted to the rotation. There were other effects which we will explore below.
 
 ## Are reach aftereffects affected by strategy use in the four groups?
 
-Do a three-way, mixed design ANOVA on reach aftereffects with instructed (yes or no) and age group (older vs. younger) as between-subjects factors and strategy use (with or without) as a within-subjects factor:
+We test if the magnitude of reach aftereffects is different given age group or instruction, by doing a three-way, mixed design ANOVA on reach aftereffects with instructed (yes or no) and age group (older vs. younger) as between-subjects factors and strategy use (with or without) as a within-subjects factor:
 
 ```{r}
 # do a statistical analysis (ANOVA on reach aftereffects)
 RAE.ANOVA()
 ```
 
-_What does that mean? What is the answer to the question?_
+Instruction and strategy have an effect and interact. When we look at the figure showing the magnitude of reach afterreffects, we can see that this means that when provided with an instruction, people can elicit part of their learning at will, i.e.: learning is (partially) made explicit by the instructions.
 
-Instruction and strategy do interact, which means that when provided with an instruction, people can elicit part of their learning at will, i.e.: it is explicit. There is a main effect of age group, but more importantly, this doesn't interact with instruction type, so that we can say that the effect of instruction on explicit learning is the same for both age groups. After reaching training, instructed older adults use the strategy to the same extent as younger instructed adults.
+There is a main effect of age group, but more importantly, this doesn't interact with instruction type (or strategy), so that we can say that the effect of instruction on explicit learning is the same for both age groups.
 
 # Localization
 
-To move we need to have position information on our limbs (and on targets). In the absence of vision we can use proprioception as well efference-based predicted consequences. Both of these are changed with visuomotor training. Here we try to tease them apart with our passiv and active localization task.
+To move we need to have position information on our limbs. In the absence of vision we can use proprioception as well efference-based predicted consequences. Both of these are changed with visuomotor training. Here we try to tease them apart with our passive and active localization task.
 
 ## Does localization change with training?
-
-_What is the question we're answering here?_
 
 Here we assess whether older and younger adults differ in how they estimate the location of their hand after training. We also determine whether this is different when they have access only to proprioception (passive localization) compared to when they have access to prediction and proprioception (active localization). The difference between these two is the predicted consequences plot below.
 
@@ -178,63 +158,60 @@ Here we assess whether older and younger adults differ in how they estimate the 
 plotLocalization()
 ```
 
-_What does the data actually tell us?_
+Shown is the training-induced shift in localization for active (panel A) and passive localization (panel B). We show the data across the workspace, as well as averages across three discrete points in the workspace (50, 90 and 130 degrees), each with a 95% confidence interval. In panel C the difference between active and passive localization shifts is shown. The idea is that if this difference deviates from zero (active and passive localization are systematically different), then predicted sensory consequences contributed to active localization.
 
-First we do an "omnibus ANOVA" to see if there is any effect of rotated training on localization.
+We can see that all groups show some kind of shift in both active and passive localization, with perhaps larger shifts for the older adults (we'll test this below). The third panel seems to show that younger adults may rely somewhat on predicted sensory consequences while older participants didn't, but this needs testing (see below).
+
+First we want to see if there is any effect of rotated training on localization, so we do an mixed-design "omnibus ANOVA" using rotated (no vs. yes), passive movement (no=active vs. yes=passive) as within-subject factors and age group (older vs. younger) and instruction (yes or no) as between-subject factors.
 
 ```{r}
 # do a statistical analysis (omnibus ANOVA)
 localizationANOVA()
 ```
 
-_What does that mean? What is the answer to the question?_
+Rotated training shifts localization. There are some other effects, that we will test in more depth later on. Either way, we now calculate localization shifts as the difference between aligned and rotated localization responses.
 
-Yes, rotated training shifts localization. There are some other effects, but we will test this in more depth later on.
-
-If explicit learning prevents localization (since you **know** the feedback is not veridical) then instructions should affect localization shift. If older participants use instructions differently, or if their proprioceptive acuity has decreased, age group should also affect localization shift. That is what we test here: 
+If explicit learning prevents updating predicted sensory consequences or recalibrating proprioception (since you **know** the feedback is not veridical) then instructions should affect localization shift. Also, if older participants use instructions differently, or if their proprioceptive acuity has decreased, age group should also affect localization shift. That is what we test here: 
 
 ```{r}
 # do a statistical analysis (ANOVA on passive localization difference scores)
 localizationANOVA(test='shifts')
 ```
 
+There is a main effect of age as well as a main effect of movement type, but no interaction. That is, it seems that our observation that older adults had larger training-induced shifts of localization is true. The effect of passive versus active localization seems to suggest that (at least for some groups) active localization was influenced by predicted sensory consequences.
+
+It is interesting to see that instruction has no effect. This means that any effect of instruction on hand localization is minimal, so it seems that the signals contributing to hand localization are primarily implicit.
+
 ## Is proprioceptive recalibration affected by age and instruction?
 
-_What is the question we're answering here? (Why could that be the case?)_
+We saw an effect of age group above. Here we test if this effect persists in passive localization alone, and also verify that instruction had no effect.
 
-Here we see that older adults estimate the location of their hand further than it is compared their younger adults counterparts. Instruction has no effect.
-
-
-_What does the data actually tell us?_
-
-This suggests that for whichever reason older adults' estimates of hand location are larger than young adults.
 ```{r}
 localizationANOVA(test='passive')
 ```
 
-
-_What does that mean? What is the answer to the question?_
-
-Instruction does not affect localization, so that it seems that visuo-proprioceptive discrepancies can't be ignored. There is also an effect of age group and an effect of movement type that we will investigate further.
+There is an effect of age group but no other effect. This confirms that older adults show larger proprioceptive recalibration.
 
 ## Are predicted sensory consequences affected by age and instruction?
 
-_What is the question we're answering here? (Why could that be the case?)_
 Due to experience, older adults may be able to use the predicted consequences of a motor command to better estimate where their hand is. Here we assess if age does indeed lead to this effect.
-_What is the data? (Same figure as above.) Do we see a hint of the answer in the data?_
-We can see in our plot that older adults predicted sensory consequences overlap with the zero on the axes, wheras younger adults have predicted consequences that are further away. 
-_What does the data actually tell us?_
+
+We can see in our plot that older adults predicted sensory consequences overlap with the zero on the axes, wheras younger adults have predicted consequences that are slightly deviated from zero.
+
 We run an ANOVA with age and instruction as factors to determine whether these factors play a role in our hand location estimates. 
+
 ```{r}
 # do a statistical analysis (ANOVA on the difference between active and passive localization difference scores)
 predictedConsequencesANOVA()
 
 ```
 
-_What does that mean? What is the answer to the question?_
 We find no effect of any of these factors. 
+
 ## Do older adults show predicted sensory consequences at all?
-We want to see if older adults update their predicted sensory consequences at all.
+
+Given the above results, we wanted to see if there is any evidence that older adults update predicted sensory consequences at all.
+
 We test the magnitude of predicted sensory consequences against 0 for all younger as well as for all older participants with t-tests.
 
 
@@ -242,11 +219,15 @@ We test the magnitude of predicted sensory consequences against 0 for all younge
 predConsTtests()
 ```
 Here we find that they do not. Whereas, younger adults do. It is unclear why this is the case.
-R-citation
 
-```{r}
-citation()
+```{r createSVGs}
+
+plotLearningCurves(target='svg')
+
+plotReachAftereffects(target='svg')
+
+plotLocalization(target='svg')
+
+
 ```
-
-
 
