@@ -24,9 +24,8 @@ output:
 
 library('ez')
 library('car')
-library('dplyr')
 library('svglite')
-library('effsize') # to calculate cohen's d??
+#library('effsize') # to calculate cohen's d??
 
 ```
 
