@@ -2,7 +2,7 @@
 plotReachAftereffects <- function(target='inline') {
   
   if (target == 'svg') {
-    svglite(file='doc/Fig8.svg', width=4, height=4, system_fonts=list(sans='Arial'))
+    svglite(file='doc/Fig4.svg', width=4, height=4, system_fonts=list(sans='Arial'))
   }
   
   styles <- getStyle()

@@ -4,7 +4,7 @@ plotLearningCurves <- function(target='inline') {
   styles <- getStyle()
   
   if (target == 'svg') {
-    svglite(file='doc/Fig7.svg', width=8, height=4, system_fonts=list(sans='Arial'))
+    svglite(file='doc/Fig3.svg', width=8, height=4, system_fonts=list(sans='Arial'))
   }
   
   par(mfrow=c(1,2), mar=c(4,4,2,0.1))
