@@ -51,18 +51,18 @@ Instructions should affect early learning for both age groups, but do they show 
 
 ## Was there any learning?
 
-We want to knpw whether or not reach direction changed during the rotated training block for all groups and whether this varied with instruction type and age.
+We want to know whether or not reach direction changed during the rotated training block for all groups and whether this varied with instruction type and age.
 
 The following is a plot of the reaching data:
 ```{r, fig.width=8, fig.height=4}
-# produce a plot (current panels 7A & 7B)
+# produce a plot (current Figure 3)
 plotLearningCurves()
 ```
 
+Reach deviations of 30 degrees would fully counter the rotation, so it looks like all groups learned, that instruction helped, but also that older adults perhaps benefit less from the instructions.
 
- We do a three-way mixed ANOVA on reach deviations, using block (first, second and last), instructed (non-instructed or instructed) and agegroup (younger or older) as factors.
+We do a three-way mixed ANOVA on reach deviations, using block (first, second and last), instructed (non-instructed or instructed) and agegroup (younger or older) as factors.
 
-We find that instruction did have an effect, all groups adapted fully by the end of training, and instruction did interact with age group. 
 ```{r}
 # do a statistical analysis (omnibus ANOVA)
 learningCurveANOVA()
@@ -117,7 +117,7 @@ After training with a visual rotation, with or without instructions, people are 
 
 
 ```{r, fig.width=4, fig.height=4}
-# produce a plot (current panels 7C)
+# produce a plot (current Figure 4)
 plotReachAftereffects()
 ```
 
@@ -153,7 +153,7 @@ To move we need to have position information on our limbs. In the absence of vis
 Here we assess whether older and younger adults differ in how they estimate the location of their hand after training. We also determine whether this is different when they have access only to proprioception (passive localization) compared to when they have access to prediction and proprioception (active localization). The difference between these two is the predicted consequences plot below.
 
 ```{r, fig.width=8, fig.height=2.66666}
-# produce a plot: Fig9
+# produce a plot: current Figure 5
 plotLocalization()
 ```
 
