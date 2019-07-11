@@ -137,7 +137,7 @@ It is also important to notice that while instruction interacted with age-group 
 NoCursorTtests()
 ```
 
-The lack of an effect suggests that explicit learning by instruction does not decrease reach aftereffects in either age group. Looking at the figure, it might even be that instructed older adults have slightly larger reach aftereffects.
+The lack of an effect suggests that explicit learning by instruction does not decrease reach aftereffects in either age group. Looking at the figure, it seems that instructed older adults even have slightly larger reach aftereffects than non-instructed older adults.
 
 ## Are reach aftereffects affected by strategy use in the four groups?
 
