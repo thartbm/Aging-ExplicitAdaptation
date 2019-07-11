@@ -238,4 +238,6 @@ blockLearningTtest <- function(block=1, groups=list(list('agegroup'='older', 'in
   cat(sprintf('\n%s\n',main))
   print(t.test(DVs[[1]], DVs[[2]]))
   
+  cat(sprintf('eta squared: %0.5f\n', etaSquaredTtest(DVs[[1]], DVs[[2]])))
+  
 }
