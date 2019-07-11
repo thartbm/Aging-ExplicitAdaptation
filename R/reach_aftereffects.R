@@ -193,3 +193,32 @@ getNoCursors4ANOVA <- function(styles) {
   return(NC4aov)
   
 }
+
+
+NoCursorTtests <- function() {
+  
+  styles <- getStyle()
+  
+  NC4aov <- getNoCursors4ANOVA(styles)
+  
+  NC4aov$participant <- as.factor(NC4aov$participant)
+  
+  OlderINSTR <- NC4aov$reachdeviation[which(NC4aov$training == 'rotated' & NC4aov$agegroup == 'older' & NC4aov$instructed == TRUE)] - NC4aov$reachdeviation[which(NC4aov$training == 'aligned' & NC4aov$agegroup == 'older' & NC4aov$instructed == TRUE)]
+  OlderNONIN <- NC4aov$reachdeviation[which(NC4aov$training == 'rotated' & NC4aov$agegroup == 'older' & NC4aov$instructed == FALSE)] - NC4aov$reachdeviation[which(NC4aov$training == 'aligned' & NC4aov$agegroup == 'older' & NC4aov$instructed == FALSE)]
+  YoungINSTR <- NC4aov$reachdeviation[which(NC4aov$training == 'rotated' & NC4aov$agegroup == 'younger' & NC4aov$instructed == TRUE)] - NC4aov$reachdeviation[which(NC4aov$training == 'aligned' & NC4aov$agegroup == 'younger' & NC4aov$instructed == TRUE)]
+  YoungNONIN <- NC4aov$reachdeviation[which(NC4aov$training == 'rotated' & NC4aov$agegroup == 'younger' & NC4aov$instructed == FALSE)] - NC4aov$reachdeviation[which(NC4aov$training == 'aligned' & NC4aov$agegroup == 'younger' & NC4aov$instructed == FALSE)]
+  
+  cat('Older participants:\n')
+  
+  print(t.test(OlderINSTR, OlderNONIN, alternative = "less"))
+  
+  cat(sprintf('eta-squared: %0.5f\n\n', etaSquaredTtest(OlderINSTR, OlderNONIN)))
+  
+  cat('Younger participants:\n')
+  
+  print(t.test(YoungINSTR, YoungNONIN, alternative = "less"))
+
+  cat(sprintf('eta-squared: %0.5f\n', etaSquaredTtest(YoungINSTR, YoungNONIN)))
+  
+
+}

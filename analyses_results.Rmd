@@ -123,13 +123,21 @@ plotReachAftereffects()
 
 ## Are there reach aftereffects?
 
-First, we use the "without strategy" condition to test if there are effects of rotated training on no-cursor reach directions, in a three-way mixed ANOVA, using training session (aligned or rotated) as a within-subjects factor, and instruction (yes or no) and age group (older or younger) as a between-subjects factor:
+First, we use the "without strategy" condition to test if there are effects of rotated training on no-cursor reach directions, in a three-way mixed ANOVA, using training session (aligned or rotated-with-strategy) as a within-subjects factor, and instruction (yes or no) and age group (older or younger) as a between-subjects factor:
 
 ```{r}
 NoCursorANOVA()
 ```
 
-As expected there is a main effect of training, i.e. there were reach aftereffects. In other words: the participants adapted to the rotation. There were other effects which we will explore below.
+As expected there is a main effect of training, i.e. there were reach aftereffects. In other words: the participants adapted to the rotation. There were other effects which we will explore below, but we subtract aligned reach deviations from those in the rotated session.
+
+It is also important to notice that while instruction interacted with age-group and with both age-group and session, it did not have a main effect or an interaction with instruction alone. This suggests that explicit learning, as induced by instruction did not decrease (implicit) reach aftereffects. To test this we ran two single-sided t-tests checking if reach aftereffects were smaller for the instructed as compared to the non-instructed participants for both age groups:
+
+```{r}
+NoCursorTtests()
+```
+
+The lack of an effect suggests that explicit learning by instruction does not decrease reach aftereffects in either age group. Looking at the figure, it might even be that instructed older adults have slightly larger reach aftereffects.
 
 ## Are reach aftereffects affected by strategy use in the four groups?
 
