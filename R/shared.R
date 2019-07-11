@@ -102,3 +102,42 @@ ensureData <- function(check=TRUE) {
   }
   
 }
+
+etaSquaredTtest <- function(g1,g2=NA,na.rm=TRUE,mu=0) {
+  
+  doOneSample <- FALSE
+  doTwoSample <- FALSE
+  
+  if (length(g2) == 1) {
+    if (is.na(g2)) {
+      doOneSample <- TRUE
+    } else {
+      # set mu to the single value in g2 and do a one sample one anyway?
+    }
+  } else {
+    doTwoSample <- TRUE
+  }
+  
+  if (doOneSample) {
+    
+    # compare group 1 mean with mu as explanation
+    SStotal <- sum((g1-mean(g1,na.rm=na.rm))^2)
+    SSeffect <- sum(((mean(g1, na.rm=na.rm) - mu)^2)*length(g1))
+    # 
+    # 
+    return(SSeffect / SStotal)
+    
+  }
+  
+  if (doTwoSample) {
+    
+    overallmean <- mean(c(g1,g2),na.rm=na.rm)
+    # compare overall mean with group means as explanation
+    SStotal <- sum((c(g1,g2) - overallmean)^2, na.rm=na.rm)
+    SSeffect <- sum(length(g1)*(mean(g1,na.rm=na.rm)-overallmean)^2, length(g2)*(mean(g2,na.rm=na.rm)-overallmean)^2)
+    return(SSeffect / SStotal)
+      
+  }
+  
+}
+
