@@ -371,11 +371,18 @@ predConsTtests <- function() {
   cat('younger adults predicted sensory consequences compared to 0:\n')
   print(t.test(df$predictionupdate, mu=0, alternative='less'))
   
+  cat(sprintf('eta-squared: %0.5f\n', etaSquaredTtest(g1=df$predictionupdate, mu=0)))
+  
+  cat('\n')
+  
   df <- getPredictedSensoryConsequences(agegroups='older')
   df <- aggregate(predictionupdate ~ participant, data=df, FUN=mean)
   
   cat('older adults predicted sensory consequences compared to 0:\n')
   print(t.test(df$predictionupdate, mu=0, alternative='less'))
+  
+  cat(sprintf('eta-squared: %0.5f\n', etaSquaredTtest(g1=df$predictionupdate, mu=0)))
+  
   
 }
 
