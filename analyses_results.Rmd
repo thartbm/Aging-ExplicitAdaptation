@@ -18,14 +18,11 @@ output:
 
 # Preliminaries
 
-# Packages that need to be downloaded in order to run the code
-
 ```{r eval=T, echo=F, message=F}
 
 library('ez')
 library('car')
 library('svglite')
-#library('effsize') # to calculate cohen's d??
 
 ```
 
@@ -43,6 +40,19 @@ Check to see if data is present and if not, populate folder:
 ```{r}
 ensureData()
 ```
+
+We'll look at some participant descriptives first:
+
+```{r demographics}
+participants <- checkParticipantsData()
+# other analyses could be done with these demographics
+groups <- aggregate(curves ~ group, data=participants, FUN=sum)
+names(groups)[which(names(groups) == 'curves')] <- 'N'
+groups$age_mean <- aggregate(age ~ group, data=participants, FUN=mean)$age
+groups$age_std <- aggregate(age ~ group, data=participants, FUN=sd)$age
+print(groups)
+```
+
 
 # Learning
 
@@ -227,7 +237,7 @@ predConsTtests()
 ```
 Here we find that they do not. Whereas, younger adults do. It is unclear why this is the case.
 
-```{r createSVGs}
+```{r createSVGs, include=TRUE, results="hide"}
 
 plotLearningCurves(target='svg')
 
