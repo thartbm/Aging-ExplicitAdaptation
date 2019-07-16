@@ -62,25 +62,33 @@ ensureData <- function(check=TRUE) {
                   'aging_explicit_curves.csv' = 'https://osf.io/q32v9/download',
                   'aging_implicit_curves.csv' = 'https://osf.io/efgyk/download',
                   
-                  #  '30explicit_reachaftereffects.csv'     = 'https://osf.io/sjt6b/download',
-                  #  '30implicit_reachaftereffects.csv'     = 'https://osf.io/2fcj8/download',
-                  #  'aging_explicit_reachaftereffects.csv' = 'https://osf.io/m4tec/download',
-                  #  'aging_implicit_reachaftereffects.csv' = 'https://osf.io/azewy/download',
-                  
                   '30explicit_nocursors.csv'     = 'https://osf.io/utw7g/download',
                   '30implicit_nocursors.csv'     = 'https://osf.io/rkd6w/download',
                   'aging_explicit_nocursors.csv' = 'https://osf.io/9hksg/download',
                   'aging_implicit_nocursors.csv' = 'https://osf.io/hktd5/download',
-                
+                  
+                  # RAW LOCALIZATION DATA, not used in scripts:
+                  #'30explicit_localization.csv'     = 'https://osf.io/x38nq/download',
+                  #'30implicit_localization.csv'     = 'https://osf.io/qykzt/download',
+                  #'aging_explicit_localization.csv' = 'https://osf.io/4wkh2/download',
+                  #'aging_implicit_localization.csv' = 'https://osf.io/yck5w/download',
+                  
+                  # confidence intervals for localization throughout the used workspace
+                  # calculate with a sample t-distribution
                   '30explicit_localization_tCI.csv'     = 'https://osf.io/z3rct/download',
                   '30implicit_localization_tCI.csv'     = 'https://osf.io/bjwm6/download',
                   'aging_explicit_localization_tCI.csv' = 'https://osf.io/ntx7s/download',
                   'aging_implicit_localization_tCI.csv' = 'https://osf.io/r7f8z/download',
                   
+                  # localization at three points in the workspace
+                  # used for ANOVA's, and the averages in the figures
                   '30explicit_loc_p3_AOV.csv'     = 'https://osf.io/84tw2/download',
                   '30implicit_loc_p3_AOV.csv'     = 'https://osf.io/2vem6/download',
                   'aging_explicit_loc_p3_AOV.csv' = 'https://osf.io/f83p7/download',
-                  'aging_implicit_loc_p3_AOV.csv' = 'https://osf.io/s32mb/download'
+                  'aging_implicit_loc_p3_AOV.csv' = 'https://osf.io/s32mb/download',
+                  
+                  # demographics of participants
+                  'participants.csv' = 'https://osf.io/k4t7j/download'
                 )
   
   for (filename in names(data_files)) {
@@ -141,3 +149,33 @@ etaSquaredTtest <- function(g1,g2=NA,na.rm=TRUE,mu=0) {
   
 }
 
+checkParticipantsData <- function() {
+  
+  participants <- read.csv('data/participants.csv', stringsAsFactors=F)
+  groups <- c('30explicit','30implicit','aging_explicit','aging_implicit')
+  file_extensions <- c('curves','nocursors','loc_p3_AOV')
+  
+  for (extension in file_extensions) {
+    
+    participants[extension] <- NA
+    
+    for (group in groups) {
+    
+      df <- read.csv(sprintf('data/%s_%s.csv',group,extension), stringsAsFactors=F)
+      
+      if (extension %in% c('curves')) {
+        dapa <- names(df)
+      } else {
+        dapa <- unique(df$participant)
+      }
+      
+      participants[participants$participant %in% dapa,extension] <- TRUE
+      
+      
+    }
+    
+  }
+  
+  return (participants)
+  
+}
