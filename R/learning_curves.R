@@ -4,16 +4,20 @@ plotLearningCurves <- function(target='inline') {
   styles <- getStyle()
   
   if (target == 'svg') {
-    svglite(file='doc/Fig3.svg', width=8, height=4, system_fonts=list(sans='Arial'))
+    svglite(file='doc/Fig3.svg', width=7.5, height=3, system_fonts=list(sans='Arial'))
   }
   
-  par(mfrow=c(1,2), mar=c(4,4,2,0.1))
+  #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
+  par(mar=c(4,4,2,0.1))
+  
+  
+  layout(matrix(c(1,2), nrow=1, ncol=2, byrow = TRUE), widths=c(2,1), heights=c(1,1))
   
   # # # # # # # # # #
   # panel A: actual learning curves
   
-  ylims=c(-.2*max(styles$rotation),max(styles$rotation)+(.2*max(styles$rotation)))
-  plot(c(-1,36),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(-1,36),ylim=ylims,xlab='trial',ylab='reach deviation [°]',xaxt='n',yaxt='n',bty='n',main='learning - by trial')
+  ylims=c(-.1*max(styles$rotation),max(styles$rotation)+(.2*max(styles$rotation)))
+  plot(c(-1,36),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(-1,36),ylim=ylims,xlab='trial',ylab='reach deviation [°]',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
   
   mtext('A', side=3, outer=TRUE, at=c(0,1), line=-1, adj=0, padj=1)
   
@@ -32,15 +36,15 @@ plotLearningCurves <- function(target='inline') {
   axis(side=1, at=c(1,5,10,25,30,35), labels=c('1','5','10','80','85','90'),cex.axis=0.85)
   axis(side=2, at=c(0,10,20,30),cex.axis=0.85)
   
-  legend(10,15,styles$label,col=as.character(styles$color_solid),lty=styles$linestyle,bty='n',lw=2,cex=0.85)
+  legend(20,15,styles$label,col=as.character(styles$color_solid),lty=styles$linestyle,bty='n',lw=2,cex=0.60,seg.len=3)
   
   
   # # # # # # # # # #
   # panel B: blocked learning curves
   
-  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,xlab='trial set',ylab='',xaxt='n',yaxt='n',bty='n',main='learning - blocked')
+  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,xlab='trial set',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
   
-  mtext('B', side=3, outer=TRUE, at=c(1/2,1), line=-1, adj=0, padj=1)
+  mtext('B', side=3, outer=TRUE, at=c(2/3,1), line=-1, adj=0, padj=1)
   
   blockdefs <- list(c(1,3),c(4,3),c(76,15))
   

@@ -2,16 +2,16 @@
 plotReachAftereffects <- function(target='inline') {
   
   if (target == 'svg') {
-    svglite(file='doc/Fig4.svg', width=4, height=4, system_fonts=list(sans='Arial'))
+    svglite(file='doc/Fig4.svg', width=2.63 * (4/3), height=3 * (4/3), system_fonts=list(sans='Arial'))
   }
   
   styles <- getStyle()
   
   par(mfrow=c(1,1), mar=c(4,4,2,0.1))
   
-  ylims=c(-.2*max(styles$rotation),max(styles$rotation)+(.2*max(styles$rotation)))
-  plot(c(0.5,2.5),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),main='reach aftereffects',xlim=c(0.5,2.5),ylim=ylims,bty='n',
-       xaxt='n',yaxt='n',xlab='strategy use',ylab='reach deviation [°]')
+  ylims=c(-.1*max(styles$rotation),max(styles$rotation)+(.2*max(styles$rotation)))
+  plot(c(0.5,2.5),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.5,2.5),ylim=ylims,bty='n',
+       xaxt='n',yaxt='n',xlab='strategy use',ylab='reach deviation [°]',main='',font.main=1)
   
   for (groupno in c(1:length(styles$group))) {
     
@@ -54,7 +54,7 @@ plotReachAftereffects <- function(target='inline') {
   }
   
   # legend(0.5,max(styles$rotation)*(7/6),styles$label,col=as.character(styles$color),lty=styles$linestyle,bty='n',cex=0.85)
-  legend(1.2,13,styles$label,col=as.character(styles$color_solid),lw=2,lty=styles$linestyle,bty='n',cex=0.85)
+  legend(0.8,11,styles$label,col=as.character(styles$color_solid),lw=2,lty=styles$linestyle,bty='n',cex=0.75,seg.len = 3)
   
   
   
