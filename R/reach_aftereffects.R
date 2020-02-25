@@ -1,17 +1,21 @@
+source('R/shared.R')
+library(svglite)
 
 plotReachAftereffects <- function(target='inline') {
   
   if (target == 'svg') {
-    svglite(file='doc/Fig4.svg', width=2.63 * (4/3), height=3 * (4/3), system_fonts=list(sans='Arial'))
+    svglite(file='doc/Fig4-i.svg', width=2.63 * 2 * (4/3), height=3 * (4/3), system_fonts=list(sans='Arial'))
   }
   
   styles <- getStyle()
   
   par(mfrow=c(1,1), mar=c(4,4,2,0.1))
   
-  ylims=c(-.1*max(styles$rotation),max(styles$rotation)+(.2*max(styles$rotation)))
-  plot(c(0.5,2.5),c(0,0),type='l',lty=2,col=rgb(.5,.5,.5),xlim=c(0.5,2.5),ylim=ylims,bty='n',
+  ylims=c(-.1*max(styles$rotation),max(styles$rotation)+(.2*max(styles$rotation))+20)
+  
+  plot(c(-.5,3.5),c(0,0),type='l',lty=1,col=rgb(.75,.75,.75),xlim=c(-0.5,3.5),ylim=ylims,bty='n',
        xaxt='n',yaxt='n',xlab='strategy use',ylab='reach deviation [°]',main='',font.main=1)
+  lines(c(-.5,3.5),c(30,30),col=rgb(.75,.75,.75))
   
   for (groupno in c(1:length(styles$group))) {
     
@@ -28,6 +32,43 @@ plotReachAftereffects <- function(target='inline') {
     coord.x <- c(1,1,2,2)
     coord.y <- c(t.interval(reachaftereffects$exclusive),rev(t.interval(reachaftereffects$inclusive)))
     polygon(coord.x, coord.y, col=as.character(styles$color_trans[groupno]), border=NA)
+    
+    # add individual data
+    for (condition in c('exclusive','inclusive')) {
+      
+      if (condition == 'exclusive') {
+        groupX <- ((groupno-2.5)/4)
+      }
+      if (condition == 'inclusive') {
+        groupX <- ((groupno-2.5)/4) + 2.75
+      }
+      
+      Y <- reachaftereffects[,condition]
+      X <- rep(groupX,length(Y))
+      points(x=X,y=Y,pch=16,cex=.8,col=as.character(styles$color_trans[groupno]))
+      
+      # add bootstrapped confidence intervals:
+      groupX <- groupX + .075
+      
+      meandist <- getConfidenceInterval(data=Y, method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
+      
+      DX <- meandist$density$x
+      DY <- meandist$density$y / max(meandist$density$y) * .075
+      
+      DX <- c(DX[1], DX, DX[length(DX)])
+      DY <- c(0,     DY, 0)
+      
+      polygon(x=DY+groupX, y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
+      
+      lines(x=rep(groupX,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
+      #print(meandist$CI95)
+      points(x=groupX,y=mean(Y),pch=16,cex=0.8,col=as.character(styles$color_solid[groupno]))
+      
+      
+      
+      
+      
+    }
     
   }
   
@@ -50,7 +91,7 @@ plotReachAftereffects <- function(target='inline') {
   
   axis(side=1, at=c(1,2), labels=c('without strategy','with strategy'),cex.axis=0.85)
   if (max(styles$rotation) == 30) {
-    axis(side=2, at=c(0,10,20,30),cex.axis=0.85)
+    axis(side=2, at=c(0,15,30,45),cex.axis=0.85)
   }
   
   # legend(0.5,max(styles$rotation)*(7/6),styles$label,col=as.character(styles$color),lty=styles$linestyle,bty='n',cex=0.85)
