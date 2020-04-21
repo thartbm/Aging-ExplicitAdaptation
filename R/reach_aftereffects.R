@@ -165,6 +165,9 @@ getRAE4ANOVA <- function(styles) {
 
 RAE.ANOVA <- function() {
   
+  default.contrasts <- options('contrasts')
+  options(contrasts=c('contr.sum','contr.poly'))
+  
   styles <- getStyle()
 
   RAE4aov <- getRAE4ANOVA(styles)                      
@@ -175,20 +178,15 @@ RAE.ANOVA <- function() {
   print(ezANOVA(data=RAE4aov, wid=participant, dv=reachdeviation, within=strategy, between=c(instructed, agegroup),type=3))
   
   # this still includes some interactions?
-  library('afex')
-  RAE4aov$agegroup <- as.factor(RAE4aov$agegroup)
-  RAE4aov$instructed <- as.factor(RAE4aov$instructed)
-  RAE4aov$strategy <- as.factor(RAE4aov$strategy)
-  aov_car(reachdeviation ~ agegroup * instructed * strategy + Error(participant/strategy), data=RAE4aov, type=3)
   
-  # this seems to work:
-  #library('car')
-  #mod <- lm(reachdeviation ~ agegroup + instructed + strategy - participant, data=RAE4aov)
-  #Anova(mod, type=3)
+  options('contrasts' <- default.contrasts)
   
 }
 
 NoCursorANOVA <- function() {
+  
+  default.contrasts <- options('contrasts')
+  options(contrasts=c('contr.sum','contr.poly'))
   
   styles <- getStyle()
   
@@ -197,6 +195,7 @@ NoCursorANOVA <- function() {
   NC4aov$participant <- as.factor(NC4aov$participant)
   print(ezANOVA(data=NC4aov, wid=participant, dv=reachdeviation, within=training, between=c(instructed, agegroup),type=3))
   
+  options('contrasts' <- default.contrasts)
 }
 
 getNoCursors4ANOVA <- function(styles) {
