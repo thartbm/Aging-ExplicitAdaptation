@@ -164,6 +164,10 @@ getBlockedLearningCurves <- function(group, blockdefs) {
 
 learningCurveANOVA <- function() {
   
+  default.contrasts <- options('contrasts')
+  options(contrasts=c('contr.sum','contr.poly'))
+  #options('contrasts' <- default.contrasts)
+  
   styles <- getStyle()
   blockdefs <- list(c(1,3),c(4,3),c(76,15))
   
@@ -173,6 +177,8 @@ learningCurveANOVA <- function() {
   # for ez, case ID should be a factor:
   LC4aov$participant <- as.factor(LC4aov$participant)
   print(ezANOVA(data=LC4aov, wid=participant, dv=reachdeviation, within=block,between=c(instructed, agegroup),type=3))
+  
+  options('contrasts' <- default.contrasts)
   
 }
 
@@ -236,6 +242,10 @@ getLearningCurves4ANOVA <- function(styles, blockdefs) {
 
 blockLearningANOVA <- function(block=1) {
   
+  default.contrasts <- options('contrasts')
+  options(contrasts=c('contr.sum','contr.poly'))
+  
+  
   styles <- getStyle()
   blockdefs <- list(c(1,3),c(4,3),c(76,15))
   
@@ -247,6 +257,8 @@ blockLearningANOVA <- function(block=1) {
   # for ez, case ID should be a factor:
   LC4aov$participant <- as.factor(LC4aov$participant)
   print(ezANOVA(data=LC4aov, wid=participant, dv=reachdeviation, between=c(instructed, agegroup),type=3))
+  
+  options('contrasts' <- default.contrasts)
   
 }
 
