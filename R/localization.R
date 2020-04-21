@@ -164,6 +164,9 @@ plotLocalization <- function(target='inline') {
 
 localizationANOVA <- function(test='omnibus') {
   
+  default.contrasts <- options('contrasts')
+  options(contrasts=c('contr.sum','contr.poly'))
+  
   styles <- getStyle()
   
   if (test=='omnibus') {
@@ -197,6 +200,8 @@ localizationANOVA <- function(test='omnibus') {
     print(ezANOVA(dv=bias_deg, wid=participant, between=c(instructed,agegroup), data=loc4aov, type=3))
     
   }
+  
+  options('contrasts' <- default.contrasts)
   
 }
 
@@ -353,6 +358,9 @@ getPredictedSensoryConsequences <- function(agegroups='both') {
 
 predictedConsequencesANOVA <- function() {
   
+  default.contrasts <- options('contrasts')
+  options(contrasts=c('contr.sum','contr.poly'))
+  
   df <- getPredictedSensoryConsequences(agegroups='both')
   
   df <- aggregate(predictionupdate ~ participant * age * instructed, data=df, FUN=mean)
@@ -360,6 +368,8 @@ predictedConsequencesANOVA <- function() {
   df$participant <- as.factor(df$participant)
   
   print(ezANOVA(dv=predictionupdate, wid=participant, between=c(instructed,age), data=df, type=3))
+  
+  options('contrasts' <- default.contrasts)
   
 }
 
