@@ -108,11 +108,12 @@ ensureData <- function(check=TRUE) {
                   'aging_explicit_nocursors.csv' = 'https://osf.io/9hksg/download',
                   'aging_implicit_nocursors.csv' = 'https://osf.io/hktd5/download',
                   
-                  # RAW LOCALIZATION DATA, not used in scripts:
-                  #'30explicit_localization.csv'     = 'https://osf.io/x38nq/download',
-                  #'30implicit_localization.csv'     = 'https://osf.io/qykzt/download',
-                  #'aging_explicit_localization.csv' = 'https://osf.io/4wkh2/download',
-                  #'aging_implicit_localization.csv' = 'https://osf.io/yck5w/download',
+                  # RAW LOCALIZATION DATA, now used in scripts:
+                  # (only to count percentage missing data)
+                  '30explicit_localization.csv'     = 'https://osf.io/x38nq/download',
+                  '30implicit_localization.csv'     = 'https://osf.io/qykzt/download',
+                  'aging_explicit_localization.csv' = 'https://osf.io/4wkh2/download',
+                  'aging_implicit_localization.csv' = 'https://osf.io/yck5w/download',
                   
                   # confidence intervals for localization throughout the used workspace
                   # calculate with a sample t-distribution
@@ -149,6 +150,12 @@ ensureData <- function(check=TRUE) {
     }
     
   }
+  
+  cat("Check complete.")
+  if (check) {
+    cat(" (set 'check=FALSE' to force downloading and overwrite current files)")
+  }
+  cat("\n")
   
 }
 
@@ -220,3 +227,49 @@ checkParticipantsData <- function() {
   return (participants)
   
 }
+
+rejectedData <- function() {
+  
+  groups <- c('30explicit','30implicit','aging_explicit','aging_implicit')
+  learning <- c()
+  
+  localization <- list('ALact'= c(),
+                       'ALpas'= c(),
+                       'ROact'= c(),
+                       'ROpas'= c())
+  
+  sessions  <- list('AL'=0,'RO'=1)
+  movements <- list('act'=0,'pas'=1)
+  
+  for (group in groups) {
+    
+    df <- read.csv(sprintf('data/%s_curves.csv',group), stringsAsFactors = F)
+    
+    RD <- as.matrix(df)
+    learning <- c(learning, (length(which(is.na(RD))) / prod(dim(RD)) ) * 100 )
+    
+    df <- read.csv(sprintf('data/%s_localization.csv', group), stringsAsFactors = F)
+    
+    N <- length(unique(df$participant))
+    
+    for (session in names(sessions)) {
+      
+      for (movement in names(movements)) {
+        
+        subdf <- df[which(df$rotated == sessions[[session]] & df$passive == movements[[movement]]),]
+        
+        locID <- sprintf('%s%s',session,movement)
+        localization[[locID]] <- c( localization[[locID]], (1 - ((dim(subdf)[1]) / (N * 72))) * 100)
+        
+      }
+      
+    }
+    
+    print(localization)
+    
+  }
+  
+  print(data.frame('group'=groups, 'learningcurves'=learning))
+  
+}
+
