@@ -37,15 +37,15 @@ plotReachAftereffects <- function(target='inline') {
     for (condition in c('exclusive','inclusive')) {
       
       if (condition == 'exclusive') {
-        groupX <- ((groupno-2.5)/4)
+        groupX <- ((groupno/4)-0.5)
       }
       if (condition == 'inclusive') {
-        groupX <- ((groupno-2.5)/4) + 2.75
+        groupX <- ((groupno/4) + 2.25)
       }
       
       Y <- reachaftereffects[,condition]
       X <- rep(groupX,length(Y))
-      points(x=X,y=Y,pch=16,cex=.8,col=as.character(styles$color_trans[groupno]))
+      points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
       
       # add bootstrapped confidence intervals:
       groupX <- groupX + .075
@@ -58,14 +58,9 @@ plotReachAftereffects <- function(target='inline') {
       DX <- c(DX[1], DX, DX[length(DX)])
       DY <- c(0,     DY, 0)
       
-      polygon(x=DY+groupX, y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
-      
-      lines(x=rep(groupX,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
-      #print(meandist$CI95)
-      points(x=groupX,y=mean(Y),pch=16,cex=0.8,col=as.character(styles$color_solid[groupno]))
-      
-      
-      
+      #polygon(x=DY+groupX, y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
+      #lines(x=rep(groupX,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
+      #points(x=groupX,y=mean(Y),pch=16,cex=0.8,col=as.character(styles$color_solid[groupno]))
       
       
     }
