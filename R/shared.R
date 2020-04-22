@@ -108,6 +108,11 @@ ensureData <- function(check=TRUE) {
                   'aging_explicit_nocursors.csv' = 'https://osf.io/9hksg/download',
                   'aging_implicit_nocursors.csv' = 'https://osf.io/hktd5/download',
                   
+                  '30explicit_allnocursors.csv'     = 'https://osf.io/bwjxc/download',
+                  '30implicit_allnocursors.csv'     = 'https://osf.io/vkgjp/download',
+                  'aging_explicit_allnocursors.csv' = 'https://osf.io/xd643/download',
+                  'aging_implicit_allnocursors.csv' = 'https://osf.io/tnyj6/download',
+                  
                   # RAW LOCALIZATION DATA, now used in scripts:
                   # (only to count percentage missing data)
                   '30explicit_localization.csv'     = 'https://osf.io/x38nq/download',
@@ -199,13 +204,19 @@ etaSquaredTtest <- function(g1,g2=NA,na.rm=TRUE,mu=0) {
 
 checkParticipantsData <- function() {
   
+  # this function reads the participant IDs from the participants.csv file
+  # and then checks if they are all present in the files with reaching
+  # and localization data
+  # it will add columns to the participants data frame for each data file,
+  # and set the value to TRUE if the participant has data in that file
+  
   participants <- read.csv('data/participants.csv', stringsAsFactors=F)
   groups <- c('30explicit','30implicit','aging_explicit','aging_implicit')
-  file_extensions <- c('curves','nocursors','loc_p3_AOV')
+  file_extensions <- c('curves','nocursors','loc_p3_AOV','localization','allnocursors')
   
   for (extension in file_extensions) {
     
-    participants[extension] <- NA
+    participants[extension] <- FALSE
     
     for (group in groups) {
     
@@ -241,6 +252,9 @@ rejectedData <- function() {
   sessions  <- list('AL'=0,'RO'=1)
   movements <- list('act'=0,'pas'=1)
   
+  nocursors <- list('aligned'=c(),'exclude'=c(),'include'=c())
+  nctypes <- c('aligned','exclude','include')
+  
   for (group in groups) {
     
     df <- read.csv(sprintf('data/%s_curves.csv',group), stringsAsFactors = F)
@@ -265,11 +279,46 @@ rejectedData <- function() {
       
     }
     
-    print(localization)
+    df <- read.csv(sprintf('data/%s_allnocursors.csv',group), stringsAsFactors = F)
+    
+    N <- length(unique(df$participant))
+    
+    for (nctype in nctypes) {
+      
+      subdf <- df[which(df$condition == nctype),]
+      nocursors[[nctype]] <- c(nocursors[[nctype]], (length(which(is.na(subdf$angular_deviation))) / (N * 36)) * 100)
+      
+    }
     
   }
   
-  print(data.frame('group'=groups, 'learningcurves'=learning))
+
+  for (group in groups) {
+    
+
+    
+  }
+  
+  rejected <- data.frame('learningcurves'=learning, 
+                         'loc-alignedactive'=localization[['ALact']],
+                         'loc-alignedpassive'=localization[['ALpas']],
+                         'loc-rotatedactive'=localization[['ROact']],
+                         'loc-rotatedpassive'=localization[['ROpas']],
+                         'nc-aligned'=nocursors[['aligned']],
+                         'nc-exclude'=nocursors[['exclude']],
+                         'nc-include'=nocursors[['include']])
+  
+  columns <- names(rejected)
+  rejected <- as.data.frame(t(as.matrix(rejected)), row.names=columns)
+  names(rejected) <- groups
+  rejmat <- as.matrix(rejected)
+  
+  younger <- c(mean(rejmat[1,1:2]), mean(rejmat[2:4,1:2]), mean(rejmat[6:8,1:2]))
+  older   <- c(mean(rejmat[1,3:4]), mean(rejmat[2:4,3:4]), mean(rejmat[6:8,3:4]))
+  short <- data.frame('younger'=younger, 'older'=older, row.names=c('learningcurves','localization','nocursors'))
+  
+  
+  return(list('full'=rejected, 'short'=short))
   
 }
 
