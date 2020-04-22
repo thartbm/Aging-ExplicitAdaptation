@@ -78,7 +78,7 @@ Instructions should affect early learning for both age groups, but do they show 
 We want to know whether or not reach direction changed during the rotated training block for all groups and whether this varied with instruction type and age.
 
 The following is a plot of the reaching data:
-```{r, fig.width=8, fig.height=4}
+```{r, fig.width=8, fig.height=5}
 # produce a plot (current Figure 3)
 plotLearningCurves()
 ```
