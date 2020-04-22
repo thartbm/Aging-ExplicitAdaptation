@@ -186,7 +186,7 @@ To move we need to have position information on our limbs. In the absence of vis
 
 Here we assess whether older and younger adults differ in how they estimate the location of their hand after training. We also determine whether this is different when they have access only to proprioception (passive localization) compared to when they have access to prediction and proprioception (active localization). The difference between these two is the predicted consequences plot below.
 
-```{r, fig.width=8, fig.height=2.66666}
+```{r, fig.width=8, fig.height=6}
 # produce a plot: current Figure 5
 plotLocalization()
 ```
