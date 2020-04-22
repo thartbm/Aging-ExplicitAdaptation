@@ -6,10 +6,14 @@ plotLocalization <- function(target='inline') {
   styles <- getStyle()
   
   if (target == 'svg') {
-    svglite(file='doc/Fig5.svg', width=7.5, height=3, system_fonts=list(sans='Arial'))
+    svglite(file='doc/Fig5.svg', width=7.5, height=5, system_fonts=list(sans='Arial'))
   }
   
-  par(mfrow=c(1,3), mar=c(4,4,2,0.1))
+  par(mar=c(4,4,2,0.1))
+  
+  layout(matrix(c(1,2,3,4,5,6), nrow=2, ncol=3, byrow = TRUE), widths=c(1,1,1), heights=c(1,1))
+  
+  
   
   # # # # # # # # # #
   # panels A & B: active and passive localization
@@ -19,13 +23,14 @@ plotLocalization <- function(target='inline') {
     reachtype <- c('active','passive')[reachtype.idx]
     
     # create plot panel with the right properties
-    plot(c(25,175),c(0,0),type='l',main=sprintf('%s localization',reachtype),xlim=c(25,175),ylim=c(2,-17),axes=FALSE,xlab='hand angle [°]', ylab='localization shift [°]',lty=2,col=rgb(.5,.5,.5),font.main=1)
+    plot(c(25,155),c(0,0),type='l',main=sprintf('%s localization',reachtype),xlim=c(25,155),ylim=c(4,-17),axes=FALSE,xlab='hand angle [°]', ylab='localization shift [°]',lty=1,col=rgb(.75,.75,.75),font.main=1)
     
-    mtext(c('A','B')[reachtype.idx], side=3, outer=TRUE, at=c(c(0,1/3)[reachtype.idx],1), line=-1, adj=0, padj=1)
+    #mtext(c('A','B')[reachtype.idx], side=3, outer=TRUE, at=c(c(0,1/3)[reachtype.idx],1), line=-1, adj=0, padj=1)
+    mtext(c('A','B')[reachtype.idx], outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
     
     axis(1, at=c(45,90,135),cex.axis=0.85)
     axis(2, at=c(0,-5,-10,-15),cex.axis=0.85)
-    
+    #axis(2, at=c(15,5,-5,-15,-25),cex.axis=0.85)
     
     for (groupno in c(1:length(styles$group))) {
       
@@ -60,35 +65,20 @@ plotLocalization <- function(target='inline') {
       
     }
     
-    # ADD AVERAGE DOTS
-    
-    for (groupno in c(1:length(styles$group))) {
-      
-      group <- styles$group[groupno]
-      
-      localization <- read.csv(sprintf('data/%s_loc_p3_AOV.csv',group))
-      localization <- localization[which(localization$passive_b == (reachtype.idx-1)),]
-      localization <- aggregate(bias_deg ~ participant*rotated_b, data=localization, FUN=mean)
-      shift <- localization$bias_deg[which(localization$rotated_b == 1)] - localization$bias_deg[which(localization$rotated_b == 0)]
-      
-      xloc <- 155 + (groupno*4)
-      CI <- t.interval(shift)
-      #arrows(xloc, CI[2], xloc, CI[1], length=0.05, angle=90, code=3, col=as.character(styles$color_solid[groupno]), lty=styles$linestyle[groupno])
-      lines(c(xloc, xloc), c(CI[2], CI[1]), col=as.character(styles$color_solid[groupno]), lty=styles$linestyle[groupno])
-      lines(c(xloc-1.5, xloc+1.5), c(CI[1], CI[1]), col=as.character(styles$color_solid[groupno]), lty=1)
-      lines(c(xloc-1.5, xloc+1.5), c(CI[2], CI[2]), col=as.character(styles$color_solid[groupno]), lty=1)
-      points(xloc, mean(shift), col=as.character(styles$color_solid[groupno]), pch=19)
-      
-    }
-    
   }
   
-  plot(c(25,175),c(0,0),type='l',main='predicted consequences',xlim=c(25,175),ylim=c(2,-17),axes=FALSE,xlab='hand angle [°]', ylab='update [°]',lty=2,col=rgb(.5,.5,.5),font.main=1)
   
-  mtext('C', side=3, outer=TRUE, at=c(2/3,1), line=-1, adj=0, padj=1)
+  # # # # # # # # # # # # # # # # #
+  # PANEL C: predicted sensory consequences
+  
+  plot(c(25,155),c(0,0),type='l',main='predicted consequences',xlim=c(25,155),ylim=c(4,-17),axes=FALSE,xlab='hand angle [°]', ylab='update [°]',lty=1,col=rgb(.75,.75,.75),font.main=1)
+  
+  #mtext('C', side=3, outer=TRUE, at=c(2/3,1), line=-1, adj=0, padj=1)
+  mtext('C', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
   
   axis(1, at=c(45,90,135),cex.axis=0.85)
   axis(2, at=c(0,-5,-10,-15),cex.axis=0.85)
+  #axis(2, at=c(15,5,-5,-15,-25),cex.axis=0.85)
   
   for (groupno in c(1:length(styles$group))) {
     
@@ -123,8 +113,63 @@ plotLocalization <- function(target='inline') {
     
   }
   
-  # #   # ADD AVERAGE DOTS
-  # #   
+  
+  legend(60,-15,as.character(styles$label),col=as.character(styles$color_solid),lty=styles$linestyle,bty='n',lw=2,cex=0.85, seg.len=3)
+  
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+  # PANELS D & E: individual points for localization shifts
+  
+  # ADD AVERAGE DOTS
+  
+  for (reachtype.idx in c(1,2)) {
+    
+    reachtype <- c('active','passive')[reachtype.idx]
+    
+    # create plot panel with the right properties
+    plot(c(0,5),c(0,0),type='l',main=sprintf('%s localization',reachtype),xlim=c(0,5),ylim=c(15,-25),axes=FALSE,xlab='group', ylab='localization shift [°]',lty=1,col=rgb(.75,.75,.75),font.main=1)
+    
+    mtext(c('D','E')[reachtype.idx], outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+    
+    axis(1, at=c(1,2,3,4), labels=c('YN','YI','ON','OI'), cex.axis=0.85)
+    #axis(2, at=c(15,5,-5,-15,-25), cex.axis=0.85)
+    axis(2, at=c(10,0,-10,-20), cex.axis=0.85)
+    
+    for (groupno in c(1:length(styles$group))) {
+      
+      group <- styles$group[groupno]
+      
+      localization <- read.csv(sprintf('data/%s_loc_p3_AOV.csv',group))
+      localization <- localization[which(localization$passive_b == (reachtype.idx-1)),]
+      localization <- aggregate(bias_deg ~ participant*rotated_b, data=localization, FUN=mean)
+      shift <- localization$bias_deg[which(localization$rotated_b == 1)] - localization$bias_deg[which(localization$rotated_b == 0)]
+      
+      points(rep(groupno-0.25, length(shift)), shift, col=as.character(styles$color_trans[groupno]), pch=16, cex=1.5)
+      
+      xloc <- groupno+0.25
+      CI <- t.interval(shift)
+      #arrows(xloc, CI[2], xloc, CI[1], length=0.05, angle=90, code=3, col=as.character(styles$color_solid[groupno]), lty=styles$linestyle[groupno])
+      lines(c(xloc, xloc), c(CI[2], CI[1]), col=as.character(styles$color_solid[groupno]), lty=1)
+      # lty = styles$linestyle[groupno]
+      #lines(c(xloc-1.5, xloc+1.5), c(CI[1], CI[1]), col=as.character(styles$color_solid[groupno]), lty=1)
+      #lines(c(xloc-1.5, xloc+1.5), c(CI[2], CI[2]), col=as.character(styles$color_solid[groupno]), lty=1)
+      points(xloc, mean(shift), col=as.character(styles$color_solid[groupno]), pch=19)
+      
+    }
+    
+  }
+  
+  
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+  # PANEL F: predicted consequences individual data points
+  
+  plot(c(0,5),c(0,0),type='l',main='predicted consequences',xlim=c(0,5),ylim=c(15,-25),axes=FALSE,xlab='group', ylab='update [°]',lty=1,col=rgb(.75,.75,.75),font.main=1)
+  
+  mtext('F', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
+  
+  axis(1, at=c(1,2,3,4), labels=c('YN','YI','ON','OI'), cex.axis=0.85)
+  # axis(2, at=c(15,5,-5,-15,-25), cex.axis=0.85)
+  axis(2, at=c(10,0,-10,-20), cex.axis=0.85)
+  
   for (groupno in c(1:length(styles$group))) {
     
     group <- styles$group[groupno]
@@ -141,18 +186,20 @@ plotLocalization <- function(target='inline') {
     
     shift <- shifts[[1]] - shifts[[2]]
     
-    xloc <- 155 + (groupno*4)
+    points(rep(groupno-0.25, length(shift)), shift, col=as.character(styles$color_trans[groupno]), pch=16, cex=1.5)
+    
+    xloc <- groupno + 0.25
     CI <- t.interval(shift)
     #arrows(xloc, CI[2], xloc, CI[1], length=0.05, angle=90, code=3, col=as.character(styles$color[groupno]), lty=styles$linestyle[groupno])
-    lines(c(xloc, xloc), c(CI[2], CI[1]), col=as.character(styles$color_solid[groupno]), lty=styles$linestyle[groupno])
-    lines(c(xloc-1.5, xloc+1.5), c(CI[1], CI[1]), col=as.character(styles$color_solid[groupno]), lty=1)
-    lines(c(xloc-1.5, xloc+1.5), c(CI[2], CI[2]), col=as.character(styles$color_solid[groupno]), lty=1)
-    points(xloc, mean(shift), col=as.character(styles$color_solid[groupno]), pch=19)
+    lines(c(xloc, xloc), c(CI[2], CI[1]), col=as.character(styles$color_solid[groupno]), lty=1)
+    # lty = styles$linestyle[groupno]
+    #lines(c(xloc-1.5, xloc+1.5), c(CI[1], CI[1]), col=as.character(styles$color_solid[groupno]), lty=1)
+    #lines(c(xloc-1.5, xloc+1.5), c(CI[2], CI[2]), col=as.character(styles$color_solid[groupno]), lty=1)
+    points(xloc, mean(shift), col=as.character(styles$color_solid[groupno]), pch=19) # pch=19
     
   }
   
   
-  legend(60,-15,as.character(styles$label),col=as.character(styles$color_solid),lty=styles$linestyle,bty='n',lw=2,cex=0.85, seg.len=3)
   
 }
 
