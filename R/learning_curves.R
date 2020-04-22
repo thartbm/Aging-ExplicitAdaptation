@@ -4,7 +4,7 @@ plotLearningCurves <- function(target='inline') {
   styles <- getStyle()
   
   if (target == 'svg') {
-    svglite(file='doc/Fig3.svg', width=7.5, height=3, system_fonts=list(sans='Arial'))
+    svglite(file='doc/Fig3.svg', width=7.5, height=5, system_fonts=list(sans='Arial'))
   }
   
   #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
@@ -17,7 +17,8 @@ plotLearningCurves <- function(target='inline') {
   # panel A: actual learning curves
   
   ylims=c(-.1*max(styles$rotation),max(styles$rotation)+(.2*max(styles$rotation)))
-  plot(c(-1,36),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(-1,36),ylim=ylims,xlab='trial',ylab='reach deviation [°]',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
+  plot(c(-1,36),c(0,0),col=rgb(0.75,0.75,0.75),type='l',lty=1,xlim=c(-2,37),ylim=ylims,xlab='trial',ylab='reach deviation [°]',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
+  lines(c(-1,36),c(30,30),col=rgb(.75,.75,.75),lty=1)
   
   #mtext('A', side=3, outer=TRUE, at=c(0,1), line=-1, adj=0, padj=1)
   mtext('A', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
@@ -43,7 +44,8 @@ plotLearningCurves <- function(target='inline') {
   # # # # # # # # # #
   # panel B: blocked learning curves
   
-  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,xlab='trial set',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
+  plot(c(0.5,4.5),c(0,0),col=rgb(0.75,0.75,0.75),type='l',lty=1,xlim=c(0.25,4.75),ylim=ylims,xlab='trial set',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
+  lines(c(0.5,4.5),c(30,30),col=rgb(.75,.75,.75),lty=1)
   
   #mtext('B', side=3, outer=TRUE, at=c(2/3,1), line=-1, adj=0, padj=1)
   #mtext('B', outer=FALSE, side=3, at=c(0,0), line=1, adj=0, padj=1)
@@ -94,7 +96,8 @@ plotLearningCurves <- function(target='inline') {
   # # # # # # # # # #
   # panel C: individual participants in the final trial set
   
-  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,xlab='group',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
+  plot(c(0.5,4.5),c(0,0),col=rgb(0.75,0.75,0.75),type='l',lty=1,xlim=c(0.25,4.75),ylim=ylims,xlab='group',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
+  lines(c(0.5,4.5),c(30,30),col=rgb(.75,.75,.75),lty=1)
   
   mtext('C', outer=FALSE, side=3, line=1, adj=0, padj=1)
   
@@ -132,7 +135,8 @@ plotLearningCurves <- function(target='inline') {
   # # # # # # # # # #
   # panel D: individual participants in the final trial set
   
-  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,xlab='group',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
+  plot(c(0.75,4.5),c(0,0),col=rgb(0.75,0.75,0.75),type='l',lty=1,xlim=c(0.25,4.75),ylim=ylims,xlab='group',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
+  lines(c(0.5,4.5),c(30,30),col=rgb(.75,.75,.75),lty=1)
   
   mtext('D', outer=FALSE, side=3, line=1, adj=0, padj=1)
   
@@ -169,7 +173,8 @@ plotLearningCurves <- function(target='inline') {
   # # # # # # # # # #
   # panel E: individual participants in the final trial set
   
-  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,xlab='group',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
+  plot(c(0.5,4.5),c(0,0),col=rgb(0.75,0.75,0.75),type='l',lty=1,xlim=c(0.25,4.75),ylim=ylims,xlab='group',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
+  lines(c(0.5,4.5),c(30,30),col=rgb(.75,.75,.75),lty=1)
   
   mtext('E', outer=FALSE, side=3, line=1, adj=0, padj=1)
   
