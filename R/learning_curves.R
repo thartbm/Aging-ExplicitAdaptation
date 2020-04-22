@@ -11,7 +11,7 @@ plotLearningCurves <- function(target='inline') {
   par(mar=c(4,4,2,0.1))
   
   
-  layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(3,2,2), heights=c(1,1))
+  layout(matrix(c(1,1,2,3,4,5), nrow=2, ncol=3, byrow = TRUE), widths=c(1,1,1), heights=c(1,1))
   
   # # # # # # # # # #
   # panel A: actual learning curves
@@ -19,7 +19,8 @@ plotLearningCurves <- function(target='inline') {
   ylims=c(-.1*max(styles$rotation),max(styles$rotation)+(.2*max(styles$rotation)))
   plot(c(-1,36),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(-1,36),ylim=ylims,xlab='trial',ylab='reach deviation [°]',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
   
-  mtext('A', side=3, outer=TRUE, at=c(0,1), line=-1, adj=0, padj=1)
+  #mtext('A', side=3, outer=TRUE, at=c(0,1), line=-1, adj=0, padj=1)
+  mtext('A', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
   
   for (groupno in c(1:length(styles$group))) {
     
@@ -44,7 +45,9 @@ plotLearningCurves <- function(target='inline') {
   
   plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,xlab='trial set',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
   
-  mtext('B', side=3, outer=TRUE, at=c(3/7,1), line=-1, adj=0, padj=1)
+  #mtext('B', side=3, outer=TRUE, at=c(2/3,1), line=-1, adj=0, padj=1)
+  #mtext('B', outer=FALSE, side=3, at=c(0,0), line=1, adj=0, padj=1)
+  mtext('B', outer=FALSE, side=3, line=1, adj=0, padj=1)
   
   blockdefs <- list(c(1,3),c(4,3),c(76,15))
   
@@ -89,21 +92,21 @@ plotLearningCurves <- function(target='inline') {
   
   
   # # # # # # # # # #
-  # panel C: individual participants in the first trial set
+  # panel C: individual participants in the final trial set
   
   plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,xlab='group',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
   
-  mtext('C', side=3, outer=TRUE, at=c(5/7,1), line=-1, adj=0, padj=1)
+  mtext('C', outer=FALSE, side=3, line=1, adj=0, padj=1)
   
   blockdefs <- list(c(1,3))
-                    
+  
   for (groupno in c(1:length(styles$group))) {
     
     group <- styles$group[groupno]
     
     blocked <- getBlockedLearningCurves(group, blockdefs)
     
-    X <- rep((groupno-(1/3)),length(blocked))
+    X <- rep(groupno,length(blocked))
     Y <- c(blocked)
     points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
     
@@ -115,17 +118,91 @@ plotLearningCurves <- function(target='inline') {
     DX <- c(DX[1], DX, DX[length(DX)])
     DY <- c(0,     DY, 0)
     
-    polygon(x=DY+groupno, y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
-    
-    lines(x=rep(groupno,2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
+    # these lines draw the distribution of bootstrapped means, and the 95% CI
+    #polygon(x=DY+groupno+(1/3), y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
+    #lines(x=rep(groupno+(1/3),2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
     #print(meandist$CI95)
-    points(x=groupno,y=mean(c(blocked)),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+    #points(x=groupno+(1/3),y=mean(c(blocked)),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
     
   }
   
+  axis(side=1, at=c(1,2,3,4),labels=c('YN','YI','ON','OI'))
+  axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=0.85)
+  
+  # # # # # # # # # #
+  # panel D: individual participants in the final trial set
+  
+  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,xlab='group',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
+  
+  mtext('D', outer=FALSE, side=3, line=1, adj=0, padj=1)
+  
+  blockdefs <- list(c(4,3))
+  
+  for (groupno in c(1:length(styles$group))) {
+    
+    group <- styles$group[groupno]
+    
+    blocked <- getBlockedLearningCurves(group, blockdefs)
+    
+    X <- rep(groupno,length(blocked))
+    Y <- c(blocked)
+    points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
+    
+    meandist <- getConfidenceInterval(data=c(blocked), method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
+    
+    DX <- meandist$density$x
+    DY <- meandist$density$y / max(meandist$density$y) / 2.5
+    
+    DX <- c(DX[1], DX, DX[length(DX)])
+    DY <- c(0,     DY, 0)
+    
+    #polygon(x=DY+groupno+(1/3), y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
+    #lines(x=rep(groupno+(1/3),2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
+    #print(meandist$CI95)
+    #points(x=groupno+(1/3),y=mean(c(blocked)),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+    
+  }
   
   axis(side=1, at=c(1,2,3,4),labels=c('YN','YI','ON','OI'))
   axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=0.85)
+  
+  # # # # # # # # # #
+  # panel E: individual participants in the final trial set
+  
+  plot(c(0,5),c(0,0),col=rgb(0.5,0.5,0.5),type='l',lty=2,xlim=c(0.5,4.5),ylim=ylims,xlab='group',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
+  
+  mtext('E', outer=FALSE, side=3, line=1, adj=0, padj=1)
+  
+  blockdefs <- list(c(76,15))
+  
+  for (groupno in c(1:length(styles$group))) {
+    
+    group <- styles$group[groupno]
+    
+    blocked <- getBlockedLearningCurves(group, blockdefs)
+    
+    X <- rep(groupno,length(blocked))
+    Y <- c(blocked)
+    points(x=X,y=Y,pch=16,cex=1.5,col=as.character(styles$color_trans[groupno]))
+    
+    meandist <- getConfidenceInterval(data=c(blocked), method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
+    
+    DX <- meandist$density$x
+    DY <- meandist$density$y / max(meandist$density$y) / 2.5
+    
+    DX <- c(DX[1], DX, DX[length(DX)])
+    DY <- c(0,     DY, 0)
+    
+    #polygon(x=DY+groupno+(1/3), y=DX, border=FALSE, col=as.character(styles$color_trans[groupno]))
+    #lines(x=rep(groupno+(1/3),2),y=meandist$CI95,col=as.character(styles$color_solid[groupno]))
+    #print(meandist$CI95)
+    #points(x=groupno+(1/3),y=mean(c(blocked)),pch=16,cex=1.5,col=as.character(styles$color_solid[groupno]))
+    
+  }
+  
+  axis(side=1, at=c(1,2,3,4),labels=c('YN','YI','ON','OI'))
+  axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=0.85)
+  
   
   
   if (target == 'svg') {
