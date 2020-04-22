@@ -38,7 +38,7 @@ source('R/shared.R') # color scheme, function for confidence intervals, data dow
 Check to see if data is present and if not, populate folder:
 
 ```{r}
-ensureData()
+ensureData(check=TRUE)
 ```
 
 We'll look at some participant descriptives first:
@@ -53,6 +53,20 @@ groups$age_std <- aggregate(age ~ group, data=participants, FUN=sd)$age
 print(groups)
 ```
 
+As well as percentages of rejected trials:
+
+```{r}
+rejected <- rejectedData()
+print(rejected$full)
+```
+
+That's too much to report, so here is a summary table:
+
+```{r}
+print(rejected$short)
+```
+
+Slightly more trials have been rejected for the older adults as for the younger adults, but all percentages are pretty low (well below 5%).
 
 # Learning
 
@@ -126,7 +140,7 @@ Crucially, there is no effect of age group, nor an interaction between age group
 After training with a visual rotation, with or without instructions, people are more or less aware of the rotation that the experiment imposes on the visual feedback. To the degree that they are aware of what they are doing to reach to the target with altered feedback, they should also be able to "switch off" their strategy, which we test here with a PDP-like method (see Werner et al., 2015) by asking participants to reach with or without a strategy in the absence of visual feedback ("no-cursor" or "open-loop" reaches).
 
 
-```{r, fig.width=4, fig.height=4}
+```{r, fig.width=6, fig.height=5.5}
 # produce a plot (current Figure 4)
 plotReachAftereffects()
 ```
@@ -139,7 +153,7 @@ First, we use the "without strategy" condition to test if there are effects of r
 NoCursorANOVA()
 ```
 
-As expected there is a main effect of training, i.e. there were reach aftereffects. In other words: the participants adapted to the rotation. There were other effects which we will explore below, but we subtract aligned reach deviations from those in the rotated session.
+As expected there is a main effect of training, i.e. there were reach aftereffects. In other words: the participants adapted to the rotation. There were other effects which we will explore below, but first we subtract aligned reach deviations from those in the rotated session.
 
 It is also important to notice that while instruction interacted with age-group and with both age-group and session, it did not have a main effect or an interaction with instruction alone. This suggests that explicit learning, as induced by instruction did not decrease (implicit) reach aftereffects. To test this we ran two single-sided t-tests checking if reach aftereffects were smaller for the instructed as compared to the non-instructed participants for both age groups:
 
@@ -160,7 +174,9 @@ RAE.ANOVA()
 
 Instruction and strategy have an effect and interact. When we look at the figure showing the magnitude of reach afterreffects, we can see that this means that when provided with an instruction, people can elicit part of their learning at will, i.e.: learning is (partially) made explicit by the instructions.
 
-There is a main effect of age group, but more importantly, this doesn't interact with instruction type (or strategy), so that we can say that the effect of instruction on explicit learning is the same for both age groups.
+There is a main effect of age group, this doesn't interact with instruction type (or strategy), which would mean that the effect of instruction on explicit learning is the same for both age groups. However, there is also a main effect of age, which could mean that implicit learning has inrceased overall in the older participants. This seems most pronounced in the with-strategy condition
+
+======================== SUBTRACT WITH-STRATEGY FROM WITHOUT-STRATEGY RAE ?????
 
 # Localization
 
