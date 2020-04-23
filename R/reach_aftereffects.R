@@ -165,7 +165,7 @@ RAE.ANOVA <- function() {
   
   styles <- getStyle()
 
-  RAE4aov <- getRAE4ANOVA(styles)                      
+  RAE4aov <- getRAE4ANOVA(styles)
   
   #learning curve ANOVA's
   # for ez, case ID should be a factor:
@@ -175,6 +175,84 @@ RAE.ANOVA <- function() {
   # this still includes some interactions?
   
   options('contrasts' <- default.contrasts)
+  
+}
+
+
+RAE.posthoc <- function() {
+  
+  default.contrasts <- options('contrasts')
+  options(contrasts=c('contr.sum','contr.poly'))
+  
+  styles <- getStyle()
+  
+  RAE4aov <- getRAE4ANOVA(styles)
+  
+  # for ez, case ID should be a factor:
+  RAE4aov$participant <- as.factor(RAE4aov$participant)
+  
+  
+  AOVmodel <- aov_ez("participant","reachdeviation",RAE4aov,between=c('agegroup','instructed'),within=c("strategy"))
+  print(nice(AOVmodel))
+  
+  library(emmeans)
+  PoHo <- emmeans::emmeans(AOVmodel,specs=c('agegroup','instructed','strategy'))
+  cat('\n')
+  print(PoHo)
+  
+  AGEGROUP <- c(-1, 1,-1, 1,-1, 1,-1, 1)
+  AGE_WOS  <- c(-1, 1,-1, 1, 0, 0, 0, 0)
+  AGE_WS   <- c( 0, 0, 0, 0,-1, 1,-1, 1)
+  INSTR_OA <- c(-1,-1, 3,-1, 0, 0, 0, 0)
+  # EX_alvsEX_ex <- c(1,0,0,0,-1,0,0,0)
+  # IM_alvsIM_ex <- c(0,1,0,0,0,-1,0,0)
+  # CJ_alvsCJ_ex <- c(0,0,1,0,0,0,-1,0)
+  # HV_alvsHV_ex <- c(0,0,0,1,0,0,0,-1)
+  # 
+  # 
+  # #based on cellmeans, confidence intervals and plots give us an idea of what contrasts we want to compare
+  # #we use implicit as a reference and compare all groups to it
+  # #compare cursor jump and hand view as well?
+  # 
+  # 
+  contrastList <- list( 'all younger vs. all older'=AGEGROUP, 
+                        'exclusive younger vs. older'=AGE_WOS, 
+                        'inclusive younger vs. older'=AGE_WS, 
+                        'exclusive instr. older vs. other exclusive' = INSTR_OA)
+  comparisons <- contrast(emmeans(AOVmodel,specs=c('agegroup','instructed','strategy')), contrastList, adjust='none') # adjust = FDR? sidak?
+  
+  print(comparisons)
+  
+  
+  
+  
+  # WITHOUT STRATEGY (exclusive)
+  #print(ezANOVA(data=RAE4aov[which(RAE4aov$strategy == 'exclusive'),], wid=participant, dv=reachdeviation, between=c(instructed, agegroup),type=3))
+  #print(ezANOVA(data=RAE4aov[which(RAE4aov$strategy == 'exclusive'),], wid=participant, dv=reachdeviation, between=c(agegroup),type=3))
+  
+  # WITH STRATEGY (inclusive)
+  #print(ezANOVA(data=RAE4aov[which(RAE4aov$strategy == 'inclusive'),], wid=participant, dv=reachdeviation, between=c(instructed, agegroup),type=3))
+  #print(ezANOVA(data=RAE4aov[which(RAE4aov$strategy == 'inclusive'),], wid=participant, dv=reachdeviation, between=c(agegroup),type=3))
+  
+  
+  # this still includes some interactions?
+  options('contrasts' <- default.contrasts)
+  
+}
+
+RAE.Ttests <- function() {
+  
+  styles <- getStyle()
+  
+  RAE4aov <- getRAE4ANOVA(styles)
+  
+  RAE4aov$participant <- as.factor(RAE4aov$participant)
+  
+  OlderINSTR <- RAE4aov$reachdeviation[which(RAE4aov$strategy == 'exclusive' & RAE4aov$agegroup == 'older' & RAE4aov$instructed == TRUE)] 
+  YoungINSTR <- RAE4aov$reachdeviation[which(RAE4aov$strategy == 'exclusive' & RAE4aov$agegroup == 'younger' & RAE4aov$instructed == TRUE)] 
+  
+  cat('Instructed, without-strategy:\n')
+  print(t.test(OlderINSTR, YoungINSTR, alternative = "greater"))
   
 }
 
@@ -240,6 +318,8 @@ getNoCursors4ANOVA <- function(styles) {
   return(NC4aov)
   
 }
+
+
 
 
 NoCursorTtests <- function() {
