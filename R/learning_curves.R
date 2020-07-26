@@ -38,8 +38,9 @@ plotLearningCurves <- function(target='inline') {
   axis(side=1, at=c(1,5,10,25,30,35), labels=c('1','5','10','80','85','90'),cex.axis=0.85)
   axis(side=2, at=c(0,10,20,30),cex.axis=0.85)
   
-  legend(20,15,styles$label,col=as.character(styles$color_solid),lty=styles$linestyle,bty='n',lw=2,cex=0.60,seg.len=3)
-  
+  #legend(20,15,styles$label,col=as.character(styles$color_solid),lty=styles$linestyle,bty='n',lw=2,cex=0.80,seg.len=3)
+  legendlabels <- sprintf('%s: %s', c('YN','YI','ON','OI'), styles$label)
+  legend(20,15,legendlabels,col=as.character(styles$color_solid),lty=styles$linestyle,bty='n',lw=2,cex=0.85,seg.len=3)
   
   # # # # # # # # # #
   # panel B: blocked learning curves
@@ -96,7 +97,7 @@ plotLearningCurves <- function(target='inline') {
   # # # # # # # # # #
   # panel C: individual participants in the final trial set
   
-  plot(c(0.5,4.5),c(0,0),col=rgb(0.75,0.75,0.75),type='l',lty=1,xlim=c(0.25,4.75),ylim=ylims,xlab='group',ylab='',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
+  plot(c(0.5,4.5),c(0,0),col=rgb(0.75,0.75,0.75),type='l',lty=1,xlim=c(0.25,4.75),ylim=ylims,xlab='group',ylab='individual reach deviations [°]',xaxt='n',yaxt='n',bty='n',main='',font.main=1)
   lines(c(0.5,4.5),c(30,30),col=rgb(.75,.75,.75),lty=1)
   
   mtext('C', outer=FALSE, side=3, line=1, adj=0, padj=1)
@@ -130,6 +131,7 @@ plotLearningCurves <- function(target='inline') {
   }
   
   axis(side=1, at=c(1,2,3,4),labels=c('YN','YI','ON','OI'))
+  #axis(side=1, at=c(1,2,3,4),labels=c('','','',''))
   axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=0.85)
   
   # # # # # # # # # #
@@ -168,6 +170,7 @@ plotLearningCurves <- function(target='inline') {
   }
   
   axis(side=1, at=c(1,2,3,4),labels=c('YN','YI','ON','OI'))
+  #axis(side=1, at=c(1,2,3,4),labels=c('','','',''))
   axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=0.85)
   
   # # # # # # # # # #
@@ -205,7 +208,11 @@ plotLearningCurves <- function(target='inline') {
     
   }
   
+  #legend(1,15,legend=styles$label,pch=16,col=as.character(styles$color_solid),bty='n',cex=0.8) 
+  
+  
   axis(side=1, at=c(1,2,3,4),labels=c('YN','YI','ON','OI'))
+  #axis(side=1, at=c(1,2,3,4),labels=c('','','',''))
   axis(side=2, at=c(0,10,20,30),labels=c('0','10','20','30'),cex.axis=0.85)
   
   
@@ -377,5 +384,18 @@ blockLearningTtest <- function(block=1, groups=list(list('agegroup'='older', 'in
   print(t.test(DVs[[1]], DVs[[2]]))
   
   cat(sprintf('eta squared: %0.5f\n', etaSquaredTtest(DVs[[1]], DVs[[2]])))
+  
+  groupNs <- c(length(DVs[[1]]), length(DVs[[2]]))
+  deltaMu <- mean(DVs[[1]]) - mean(DVs[[2]])
+  #stndevs <- sd(c(DVs[[1]]-mean(DVs[[1]]), DVs[[2]]-mean(DVs[[2]])))
+  stndevs <- c(sd(DVs[[1]]-mean(DVs[[1]])), sd(DVs[[2]]-mean(DVs[[2]])))
+  cat('\npower analysis:\n')
+  print(power.t.test( n = groupNs, 
+                      delta = deltaMu, 
+                      sd = stndevs, 
+                      sig.level = 0.05,
+                      type = 'two.sample',
+                      alternative = 'two.sided',
+                      strict=TRUE))
   
 }

@@ -113,8 +113,8 @@ plotLocalization <- function(target='inline') {
     
   }
   
-  
-  legend(60,-15,as.character(styles$label),col=as.character(styles$color_solid),lty=styles$linestyle,bty='n',lw=2,cex=0.85, seg.len=3)
+  legendlabels <- sprintf('%s: %s', c('YN','YI','ON','OI'), styles$label)
+  legend(45,-15,legendlabels,col=as.character(styles$color_solid),lty=styles$linestyle,bty='n',lw=2,cex=0.85, seg.len=3)
   
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
   # PANELS D & E: individual points for localization shifts
@@ -126,11 +126,13 @@ plotLocalization <- function(target='inline') {
     reachtype <- c('active','passive')[reachtype.idx]
     
     # create plot panel with the right properties
-    plot(c(0,5),c(0,0),type='l',main=sprintf('%s localization',reachtype),xlim=c(0,5),ylim=c(15,-25),axes=FALSE,xlab='group', ylab='localization shift [°]',lty=1,col=rgb(.75,.75,.75),font.main=1)
+    #plot(c(0,5),c(0,0),type='l',main=sprintf('%s localization',reachtype),xlim=c(0,5),ylim=c(15,-25),axes=FALSE,xlab='', ylab='localization shift [°]',lty=1,col=rgb(.75,.75,.75),font.main=1)
+    plot(c(0,5),c(0,0),type='l',main='',xlim=c(0,5),ylim=c(15,-25),axes=FALSE,xlab='group', ylab='individual localization shifts [°]',lty=1,col=rgb(.75,.75,.75),font.main=1)
     
     mtext(c('D','E')[reachtype.idx], outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
     
     axis(1, at=c(1,2,3,4), labels=c('YN','YI','ON','OI'), cex.axis=0.85)
+    #axis(side=1, at=c(1,2,3,4),labels=c('','','',''),cex.axis=0.85)
     #axis(2, at=c(15,5,-5,-15,-25), cex.axis=0.85)
     axis(2, at=c(10,0,-10,-20), cex.axis=0.85)
     
@@ -162,11 +164,13 @@ plotLocalization <- function(target='inline') {
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # PANEL F: predicted consequences individual data points
   
-  plot(c(0,5),c(0,0),type='l',main='predicted consequences',xlim=c(0,5),ylim=c(15,-25),axes=FALSE,xlab='group', ylab='update [°]',lty=1,col=rgb(.75,.75,.75),font.main=1)
+  #plot(c(0,5),c(0,0),type='l',main='predicted consequences',xlim=c(0,5),ylim=c(15,-25),axes=FALSE,xlab='', ylab='update [°]',lty=1,col=rgb(.75,.75,.75),font.main=1)
+  plot(c(0,5),c(0,0),type='l',main='',xlim=c(0,5),ylim=c(15,-25),axes=FALSE,xlab='group', ylab='individual updates [°]',lty=1,col=rgb(.75,.75,.75),font.main=1)
   
   mtext('F', outer=FALSE, side=3, las=1, line=1, adj=0, padj=1)
   
   axis(1, at=c(1,2,3,4), labels=c('YN','YI','ON','OI'), cex.axis=0.85)
+  #axis(side=1, at=c(1,2,3,4),labels=c('','','',''),cex.axis=0.85)
   # axis(2, at=c(15,5,-5,-15,-25), cex.axis=0.85)
   axis(2, at=c(10,0,-10,-20), cex.axis=0.85)
   
@@ -186,6 +190,8 @@ plotLocalization <- function(target='inline') {
     
     shift <- shifts[[1]] - shifts[[2]]
     
+    #print(mean(shift))
+    
     points(rep(groupno-0.25, length(shift)), shift, col=as.character(styles$color_trans[groupno]), pch=16, cex=1.5)
     
     xloc <- groupno + 0.25
@@ -199,7 +205,11 @@ plotLocalization <- function(target='inline') {
     
   }
   
+  #legend(1,-22.5,legend=styles$label,pch=16,col=as.character(styles$color_solid),bty='n',cex=0.8) 
   
+  if (target == 'svg') {
+    dev.off()
+  }
   
 }
 
@@ -430,6 +440,19 @@ predConsTtests <- function() {
   
   cat(sprintf('eta-squared: %0.5f\n', etaSquaredTtest(g1=df$predictionupdate, mu=0)))
   
+  groupNs <- dim(df)[1]
+  deltaMu <- mean(df$predictionupdate)
+  stndevs <- sd(df$predictionupdate)
+  cat('\npower analysis:\n')
+  print(power.t.test( n = groupNs, 
+                      delta = deltaMu, 
+                      sd = stndevs, 
+                      sig.level = 0.05,
+                      type = 'one.sample',
+                      alternative = 'one.sided',
+                      strict=FALSE))
+  
+  
   cat('\n')
   
   df <- getPredictedSensoryConsequences(agegroups='older')
@@ -440,6 +463,17 @@ predConsTtests <- function() {
   
   cat(sprintf('eta-squared: %0.5f\n', etaSquaredTtest(g1=df$predictionupdate, mu=0)))
   
+  groupNs <- dim(df)[1]
+  deltaMu <- mean(df$predictionupdate)
+  stndevs <- sd(df$predictionupdate)
+  cat('\npower analysis:\n')
+  print(power.t.test( n = groupNs, 
+                      delta = deltaMu, 
+                      sd = stndevs, 
+                      sig.level = 0.05,
+                      type = 'one.sample',
+                      alternative = 'one.sided',
+                      strict=FALSE))
   
 }
 

@@ -90,7 +90,8 @@ plotReachAftereffects <- function(target='inline') {
   }
   
   # legend(0.5,max(styles$rotation)*(7/6),styles$label,col=as.character(styles$color),lty=styles$linestyle,bty='n',cex=0.85)
-  legend(0.8,11,styles$label,col=as.character(styles$color_solid),lw=2,lty=styles$linestyle,bty='n',cex=0.75,seg.len = 3)
+  #legend(0.8,11,styles$label,col=as.character(styles$color_solid),lw=2,lty=styles$linestyle,bty='n',cex=0.75,seg.len = 3)
+  legend(0.8,50,styles$label,col=as.character(styles$color_solid),lw=2,lty=styles$linestyle,bty='n',cex=0.75,seg.len = 3)
   
   
   
@@ -179,7 +180,10 @@ RAE.ANOVA <- function() {
 }
 
 
-RAE.posthoc <- function() {
+RAE.posthoc <- function(doEmmeans=FALSE, doSubAOVs=FALSE, doTtests=TRUE) {
+  
+  # here we test if the main effect of age is driven by one data-point:
+  # the instructed older adults in exclude strategy reach aftereffects
   
   default.contrasts <- options('contrasts')
   options(contrasts=c('contr.sum','contr.poly'))
@@ -192,48 +196,95 @@ RAE.posthoc <- function() {
   RAE4aov$participant <- as.factor(RAE4aov$participant)
   
   
-  AOVmodel <- aov_ez("participant","reachdeviation",RAE4aov,between=c('agegroup','instructed'),within=c("strategy"))
-  print(nice(AOVmodel))
+  #### CODE BELOW USES 'AFEX' AND 'EMMEANS' FOR POSTHOC CONTRASTS:
+  # to use it: change FALSE to TRUE
+  # and make sure the packages are installed
   
-  library(emmeans)
-  PoHo <- emmeans::emmeans(AOVmodel,specs=c('agegroup','instructed','strategy'))
-  cat('\n')
-  print(PoHo)
+  # the main effect of age disappears in these posthocs
+  # if any p-value adjustment method is used
+  # this already shows its a weak effect
   
-  AGEGROUP <- c(-1, 1,-1, 1,-1, 1,-1, 1)
-  AGE_WOS  <- c(-1, 1,-1, 1, 0, 0, 0, 0)
-  AGE_WS   <- c( 0, 0, 0, 0,-1, 1,-1, 1)
-  INSTR_OA <- c(-1,-1, 3,-1, 0, 0, 0, 0)
-  # EX_alvsEX_ex <- c(1,0,0,0,-1,0,0,0)
-  # IM_alvsIM_ex <- c(0,1,0,0,0,-1,0,0)
-  # CJ_alvsCJ_ex <- c(0,0,1,0,0,0,-1,0)
-  # HV_alvsHV_ex <- c(0,0,0,1,0,0,0,-1)
-  # 
-  # 
-  # #based on cellmeans, confidence intervals and plots give us an idea of what contrasts we want to compare
-  # #we use implicit as a reference and compare all groups to it
-  # #compare cursor jump and hand view as well?
-  # 
-  # 
-  contrastList <- list( 'all younger vs. all older'=AGEGROUP, 
-                        'exclusive younger vs. older'=AGE_WOS, 
-                        'inclusive younger vs. older'=AGE_WS, 
-                        'exclusive instr. older vs. other exclusive' = INSTR_OA)
-  comparisons <- contrast(emmeans(AOVmodel,specs=c('agegroup','instructed','strategy')), contrastList, adjust='none') # adjust = FDR? sidak?
+  if (doEmmeans) {
+    
+    cat('AFEX ANOVA:\n')
+    
+    AOVmodel <- aov_ez("participant","reachdeviation",RAE4aov,between=c('agegroup','instructed'),within=c("strategy"))
+    print(nice(AOVmodel))
+    
+    library(emmeans)
+    PoHo <- emmeans::emmeans(AOVmodel,specs=c('agegroup','instructed','strategy'))
+    cat('\nmodel cell means and confidence intervals:\n\n')
+    print(PoHo)
+    
+    AGEGROUP <- c(-1, 1,-1, 1,-1, 1,-1, 1)
+    AGE_WOS  <- c(-1, 1,-1, 1, 0, 0, 0, 0)
+    AGE_WS   <- c( 0, 0, 0, 0,-1, 1,-1, 1)
+    INSTR_OA <- c(-1,-1, 1,-1, 0, 0, 0, 0)
+    AGE_NONI <- c(-1, 1, 0, 0,-1, 1, 0, 0)
+    
+    contrastList <- list( 'all younger vs. all older'=AGEGROUP, 
+                          'exclusive younger vs. older'=AGE_WOS, 
+                          'inclusive younger vs. older'=AGE_WS, 
+                          'exclusive instr. older vs. other exclusive' = INSTR_OA,
+                          'non-instructed age effects'=AGE_NONI)
+    comparisons <- contrast(emmeans(AOVmodel,specs=c('agegroup','instructed','strategy')), contrastList, adjust='none') # adjust = FDR? sidak? Bonferroni?
+    
+    cat('\nsome specific contrasts:\n\n')
+    print(comparisons)
+    
+  }
   
-  print(comparisons)
   
+  if (doSubAOVs) {
+    
+    # WITHOUT STRATEGY (exclusive)
+    cat('\nWITHOUT STRATEGY\n\n')
+    print(ezANOVA(data=RAE4aov[which(RAE4aov$strategy == 'exclusive'),], wid=participant, dv=reachdeviation, between=c(agegroup, instructed),type=3))
+    
+    # WITH STRATEGY (inclusive)
+    cat('\nWITH STRATEGY\n\n')
+    print(ezANOVA(data=RAE4aov[which(RAE4aov$strategy == 'inclusive'),], wid=participant, dv=reachdeviation, between=c(agegroup, instructed),type=3))
+    
+    # NON-INSTRUCTED
+    cat('\nNON-INSTRUCTED\n\n')
+    print(ezANOVA(data=RAE4aov[which(RAE4aov$instructed == FALSE),], wid=participant, dv=reachdeviation, within=c(strategy), between=c(agegroup),type=3))
+    
+    # INSTRUCTED
+    cat('\nINSTRUCTED\n\n')
+    print(ezANOVA(data=RAE4aov[which(RAE4aov$instructed == TRUE),], wid=participant, dv=reachdeviation, within=c(strategy), between=c(agegroup),type=3))
+    
+  }
   
-  
-  
-  # WITHOUT STRATEGY (exclusive)
-  #print(ezANOVA(data=RAE4aov[which(RAE4aov$strategy == 'exclusive'),], wid=participant, dv=reachdeviation, between=c(instructed, agegroup),type=3))
-  #print(ezANOVA(data=RAE4aov[which(RAE4aov$strategy == 'exclusive'),], wid=participant, dv=reachdeviation, between=c(agegroup),type=3))
-  
-  # WITH STRATEGY (inclusive)
-  #print(ezANOVA(data=RAE4aov[which(RAE4aov$strategy == 'inclusive'),], wid=participant, dv=reachdeviation, between=c(instructed, agegroup),type=3))
-  #print(ezANOVA(data=RAE4aov[which(RAE4aov$strategy == 'inclusive'),], wid=participant, dv=reachdeviation, between=c(agegroup),type=3))
-  
+  if (doTtests) {
+    
+    cat('\nWITHOUT STRATEGY T-TESTS:\n')
+    WOS_IN_OA <- RAE4aov$reachdeviation[which(RAE4aov$instructed == TRUE & RAE4aov$agegroup == 'older' & RAE4aov$strategy == 'exclusive')]
+    WOS_IN_YA <- RAE4aov$reachdeviation[which(RAE4aov$instructed == TRUE & RAE4aov$agegroup == 'younger' & RAE4aov$strategy == 'exclusive')]
+    WOS_NI_OA <- RAE4aov$reachdeviation[which(RAE4aov$instructed == FALSE & RAE4aov$agegroup == 'older' & RAE4aov$strategy == 'exclusive')]
+    WOS_NI_YA <- RAE4aov$reachdeviation[which(RAE4aov$instructed == FALSE & RAE4aov$agegroup == 'younger' & RAE4aov$strategy == 'exclusive')]
+    
+    # contrasting the older instructed participants with the 3 other groups:
+    IOvsIY <- t.test(WOS_IN_OA, WOS_IN_YA)
+    IOvsNO <- t.test(WOS_IN_OA, WOS_NI_OA)
+    IOvsNY <- t.test(WOS_IN_OA, WOS_NI_YA)
+    
+    # comparing the three other groups with each other:
+    IYvsNO <- t.test(WOS_IN_YA, WOS_NI_OA)
+    IYvsNY <- t.test(WOS_IN_YA, WOS_NI_YA)
+    NOvsNY <- t.test(WOS_NI_OA, WOS_NI_YA)
+    
+    pvals <- c('instructed older vs. instructed younger'         = IOvsIY$p.value,
+               'instructed older vs. non-instructed older'       = IOvsNO$p.value,
+               'instructed older vs. non-instructed younger'     = IOvsNY$p.value,
+               'instructed younger vs. non-instructed older'     = IYvsNO$p.value,
+               'instructed younger vs. non-instructed younger'   = IYvsNY$p.value,
+               'non-instructed older vs. non-instructed younger' = NOvsNY$p.value)
+    
+    useMethod='none'
+    print(data.frame('p-values'=p.adjust(pvals, method=useMethod)))
+    # method should be one of “holm”, “hochberg”, “hommel”, “bonferroni”, “BH”, “BY”, “fdr”, “none”
+    cat(sprintf('\nmethod use to adjust p-values: %s\n',useMethod))
+  }
   
   # this still includes some interactions?
   options('contrasts' <- default.contrasts)
@@ -341,11 +392,38 @@ NoCursorTtests <- function() {
   
   cat(sprintf('eta-squared: %0.5f\n\n', etaSquaredTtest(OlderINSTR, OlderNONIN)))
   
+  groupNs <- c(length(OlderINSTR), length(OlderNONIN))
+  deltaMu <- mean(OlderINSTR) - mean(OlderNONIN)
+  #stndevs <- sd(c(DVs[[1]]-mean(DVs[[1]]), DVs[[2]]-mean(DVs[[2]])))
+  stndevs <- c(sd(OlderINSTR), sd(OlderNONIN))
+  cat('\npower analysis:\n')
+  print(power.t.test( n = groupNs, 
+                      delta = deltaMu, 
+                      sd = stndevs, 
+                      sig.level = 0.05,
+                      type = 'two.sample',
+                      alternative = 'two.sided',
+                      strict=FALSE))
+  
+  
   cat('Younger participants:\n')
   
   print(t.test(YoungINSTR, YoungNONIN, alternative = "less"))
 
   cat(sprintf('eta-squared: %0.5f\n', etaSquaredTtest(YoungINSTR, YoungNONIN)))
+  
+  groupNs <- c(length(YoungINSTR), length(YoungNONIN))
+  deltaMu <- mean(YoungINSTR) - mean(YoungNONIN)
+  #stndevs <- sd(c(DVs[[1]]-mean(DVs[[1]]), DVs[[2]]-mean(DVs[[2]])))
+  stndevs <- c(sd(YoungINSTR), sd(YoungNONIN))
+  cat('\npower analysis:\n')
+  print(power.t.test( n = groupNs, 
+                      delta = deltaMu, 
+                      sd = stndevs, 
+                      sig.level = 0.05,
+                      type = 'two.sample',
+                      alternative = 'two.sided',
+                      strict=FALSE))
   
 
 }

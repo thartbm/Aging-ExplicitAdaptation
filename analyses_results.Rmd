@@ -20,9 +20,16 @@ output:
 
 ```{r eval=T, echo=F, message=F}
 
-library('ez')
-library('car')
-library('svglite')
+# these libraries are used later on
+
+library('ez')        # ANOVAs
+library('car')       # ANOVAs
+library('afex')      # ANOVAs
+library('emmeans')   # post-hoc contrasts for ANOVAs
+library('svglite')   # SVG figures
+
+# if they can't be loaded, install them, by uncommenting this:
+# install.packages(c('ez','car','afex','emmeans','svglite'))
 
 ```
 
@@ -77,13 +84,14 @@ Instructions should affect early learning for both age groups, but do they show 
 
 We want to know whether or not reach direction changed during the rotated training block for all groups and whether this varied with instruction type and age.
 
-The following is a plot of the reaching data:
+The following is a plot of the reaching data in the first 90 trials ("learning curves"):
+
 ```{r, fig.width=8, fig.height=5}
 # produce a plot (current Figure 3)
 plotLearningCurves()
 ```
 
-Reach deviations of 30 degrees would fully counter the rotation, so it looks like all groups learned, that instruction helped, but also that older adults perhaps benefit less from the instructions.
+Reach deviations of 30 degrees would fully counter the rotation, so it looks like all groups did equally well by the end of training, that instruction helped in the first few trials, but also that older adults perhaps benefit less from the instructions.
 
 We do a three-way mixed ANOVA on reach deviations, using block (first, second and last), instructed (non-instructed or instructed) and agegroup (younger or older) as factors.
 
@@ -93,7 +101,7 @@ learningCurveANOVA()
 
 ```
 
-We find a significant effect of block (that interacts with instructions and age group) so that reach deviations changed throughout the rotated training. We also show that instruction type does interact with age group, so that older and younger participants learned differently in the training.
+We find a significant effect of block (that separately interacts with instructions and with age group) so that reach deviations changed throughout the rotated training. We also show that instruction type does interact with age group, so that instructed older and younger participants perhaps learned differently in the training.
 
 ## First Block of Training
 
@@ -174,9 +182,25 @@ RAE.ANOVA()
 
 Instruction and strategy have an effect and interact. When we look at the figure showing the magnitude of reach afterreffects, we can see that this means that when provided with an instruction, people can elicit part of their learning at will, i.e.: learning is (partially) made explicit by the instructions.
 
-There is a main effect of age group, this doesn't interact with instruction type (or strategy), which would mean that the effect of instruction on explicit learning is the same for both age groups. However, there is also a main effect of age, which could mean that implicit learning has inrceased overall in the older participants. This seems most pronounced in the with-strategy condition
+There is a main effect of age group, this doesn't interact with instruction type (or strategy), which would mean that the effect of instruction on explicit learning is the same for both age groups.
 
-======================== SUBTRACT WITH-STRATEGY FROM WITHOUT-STRATEGY RAE ?????
+### Post-hoc: main effect of age
+
+However, the main effect of age could mean that implicit learning has inrceased overall in the older participants. Looking at the figure this might be driven solely by the reach aftereffects of instructed older adults in the without-strategy condition. To test this, we run some post-hoc tests. First, a set of 6 t-tests in the without strategy condition comparing all groups:
+
+```{r}
+RAE.posthoc(doEmmeans=FALSE, doSubAOVs=FALSE, doTtests=TRUE)
+```
+
+All comparisons including the instructed older adults were significant, and none of the others. (If FDR correction for multiple comparisons is used, the comparison between older instructed and older non-instructed without-strategy reach aftereffects is no longer significant.) These results confirm that the main effect of age might be driven by one of the four older-adult data points, and not be generic.
+
+Second, we can split the 2x2x2 ANOVA into four 2x2 ANOVAs, which each preserve a comparison between age groups. We can test in the exclude strategy condition, in the include strategy condition across all four groups, or we can test in the instructed groups or the non-instructed groups across both the include and exclude strategy conditions. If the instructed older adults' responses in the without strategy condition are driving the main effect of age, we should only see effects in the without strategy condition comparing all groups (perhaps interacting with instruction, as the non-instructed older adults don't have higher implicit reach aftereffects), as well as in the ANOVA on the two instructed groups.
+
+```{r}
+RAE.posthoc(doEmmeans=FALSE, doSubAOVs=TRUE, doTtests=FALSE)
+```
+
+These ANOVAs confirm that age-affects are only present when data from the instructed older adults in the without-strategy condition is included. While still other post-hoc tests are possible, these already show that the instructed older adults' without-strategy reach aftereffects are driving this effect. The question would now be if this is a real effect or an outlier, but we do not have the data to answer this.
 
 # Localization
 
@@ -251,7 +275,11 @@ We test the magnitude of predicted sensory consequences against 0 for all younge
 ```{r}
 predConsTtests()
 ```
-Here we find that they do not. Whereas, younger adults do. It is unclear why this is the case.
+Here we find that they do not, while younger adults do (effect size is reasonable in the younger adults, but power is low in each case). We can only speculate why this is the case.
+
+# Published figures
+
+The chunk of code below generates the svg versions of the figures that we submitted to the journal:
 
 ```{r createSVGs, include=TRUE, results="hide"}
 
@@ -261,6 +289,11 @@ plotReachAftereffects(target='svg')
 
 plotLocalization(target='svg')
 
+```
 
+In order to reproduce the analyses, it might be useful to have version information for all packages used:
+
+```{r}
+sessionInfo()
 ```
 
